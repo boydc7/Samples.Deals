@@ -1,0 +1,95 @@
+{
+  "executionRoleArn": "arn:aws:iam::933347060724:role/AWSServiceRoleEcsTask",
+  "containerDefinitions": [
+    {
+      "image": "datadog/agent:latest",
+      "essential": false,
+      "pseudoTerminal": false,
+      "readonlyRootFilesystem": false,
+      "privileged": false,
+      "name": "datadog-agent",
+      "memoryReservation": 128,
+      "cpu": 16,
+      "environment": [
+        {
+            "name": "DD_API_KEY",
+            "value": "8f610ab48c67cd46af0744b45c7b94a6"
+        },
+        {
+            "name": "ECS_FARGATE",
+            "value": "true"
+        }
+      ]
+    },
+    {
+      "image": "906394416424.dkr.ecr.us-west-2.amazonaws.com/aws-for-fluent-bit:latest",
+      "essential": true,
+      "pseudoTerminal": false,
+      "readonlyRootFilesystem": false,
+      "privileged": false,
+      "name": "logrouter",
+      "memoryReservation": 128,
+      "cpu": 32,
+      "firelensConfiguration": {
+        "type": "fluentbit",
+        "options": {
+          "enable-ecs-log-metadata": "true"
+        }
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "Fargate-Prod",
+          "awslogs-region": "us-west-2",
+          "awslogs-create-group": "true",
+          "awslogs-stream-prefix": "awsfirelens"
+        }
+      }
+    },
+    {
+      "image": "<PROD-API-IMAGE-NAME>",
+      "essential": true,
+      "pseudoTerminal": false,
+      "readonlyRootFilesystem": false,
+      "privileged": false,
+      "name": "rydrapi",
+      "logConfiguration": {
+        "logDriver": "awsfirelens",
+        "options": {
+          "Name": "datadog",
+          "region": "us-west-2",
+          "apiKey": "8f610ab48c67cd46af0744b45c7b94a6",
+          "dd_service": "rydr-api",
+          "dd_source": "api",
+          "dd_tags": "env:Production",
+          "TLS": "on",
+          "provider": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 2080,
+          "protocol": "tcp",
+          "containerPort": 2080
+        }
+      ],
+      "healthCheck": {
+        "retries": 1,
+        "command": [
+          "CMD-SHELL",
+          "curl --fail -s http://localhost:2080/monitor?format=json || exit 1"
+        ],
+        "timeout": 11,
+        "interval": 19
+      }
+    }
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "networkMode": "awsvpc",
+  "taskRoleArn": "arn:aws:iam::933347060724:role/AWSServiceRoleEcsTask",
+  "family": "Prod-RydrApi",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ]  
+}

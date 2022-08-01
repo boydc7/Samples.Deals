@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>333272437668-ihs8opq3q3uldqkcqbv9vnnirs1hjpli.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.333272437668-ihs8opq3q3uldqkcqbv9vnnirs1hjpli</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBZZASE0bDjyK1m4G_H-9qCWl-IF1iaSvo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>333272437668</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.rydr.app</string>
+	<key>PROJECT_ID</key>
+	<string>rydr-dev</string>
+	<key>STORAGE_BUCKET</key>
+	<string>rydr-dev.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:333272437668:ios:916e6e76790aa17af0a731</string>
+	<key>DATABASE_URL</key>
+	<string>https://rydr-dev.firebaseio.com</string>
+</dict>
+</plist>

@@ -1,0 +1,252 @@
+{
+    "locations": [
+        {
+            "name": "South Florida",
+            "url": "https://cdn.getrydr.com/images/south-florida.png",
+            "center": "26.04755307036018,-80.30397950082283",
+            "bounds": {
+                "southWest": "25.56576032759893,-80.57211457162362",
+                "northEast": "26.529345813121434,-80.03584443002205"
+            },
+            "children": [
+                {
+                    "name": "Fort Lauderdale",
+                    "url": "https://cdn.getrydr.com/images/fort-lauderdale.png",
+                    "zoom": 13,
+                    "tilt": 33.75,
+                    "center": "26.1224,-80.1373",
+                    "bounds": {
+                        "southWest": "25.99813410909281,-80.44699452402347",
+                        "northEast": "26.273065417804816,-80.06251963475637"
+                    },
+                    "children": [
+                        {
+                            "name": "Flagler Village",
+                            "url": "https://cdn.getrydr.com/images/flagler.png",
+                            "zoom": 14.5,
+                            "tilt": 0,
+                            "center": "26.131528898549192,-80.14160895401244",
+                            "bounds": {
+                                "southWest": "26.125980756071925,-80.1461579805017",
+                                "northEast": "26.13707704102646,-80.13705992752318"
+                            }
+                        },
+                        {
+                            "name": "Las Olas Blvd",
+                            "url": "https://cdn.getrydr.com/images/las-olas.png",
+                            "zoom": 14,
+                            "tilt": 0,
+                            "center": "26.119092191131518,-80.1350475636043",
+                            "bounds": {
+                                "southWest": "26.116664620376827,-80.14581931500811",
+                                "northEast": "26.12151976188621,-80.1242758122005"
+                            }
+                        },
+                        {
+                            "name": "South Fort Lauderdale",
+                            "url": "https://cdn.getrydr.com/images/south-fort-lauderdale.png",
+                            "zoom": 13.5,
+                            "tilt": 0,
+                            "center": "26.100299114801032,-80.12251415681135",
+                            "bounds": {
+                                "southWest": "26.095674427130376,-80.13813534211408",
+                                "northEast": "26.104923802471685,-80.10689297150861"
+                            }
+                        },
+                        {
+                            "name": "Oakland Park",
+                            "url": "https://cdn.getrydr.com/images/oakland-park.png",
+                            "zoom": 13,
+                            "tilt": 0,
+                            "center": "26.167250438691276,-80.12971667226464",
+                            "bounds": {
+                                "southWest": "26.15869967015498,-80.14731196340233",
+                                "northEast": "26.175801207227575,-80.11212138112694"
+                            }
+                        },
+                        {
+                            "name": "Wilton Manors",
+                            "url": "https://cdn.getrydr.com/images/wilton-manor.png",
+                            "zoom": 14.5,
+                            "tilt": 0,
+                            "center": "26.157736471949676,-80.13885764058739",
+                            "bounds": {
+                                "southWest": "26.15091841115355,-80.1510885136953",
+                                "northEast": "26.1645545327458,-80.12662676747948"
+                            }
+                        },
+                        {
+                            "name": "Lauderdale by the Sea",
+                            "url": "https://cdn.getrydr.com/images/lauderdale-by-the-sea.png",
+                            "zoom": 14.5,
+                            "tilt": 0,
+                            "center": "26.189896220274587,-80.09993342336327",
+                            "bounds": {
+                                "southWest": "26.181347112994047,-80.1074865239492",
+                                "northEast": "26.198445327555127,-80.09238032277733"
+                            }
+                        },
+                        {
+                            "name": "Pompano Beach",
+                            "url": "https://cdn.getrydr.com/images/pompano-beach.png",
+                            "zoom": 13,
+                            "tilt": 0,
+                            "center": "26.23151089169624,-80.10544006353985",
+                            "bounds": {
+                                "southWest": "26.218730310982135,-80.12689773565899",
+                                "northEast": "26.244291472410346,-80.0839823914207"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Delray Beach & Boca Raton",
+                    "url": "https://cdn.getrydr.com/images/delray.png",
+                    "zoom": 11.5,
+                    "tilt": 0,
+                    "center": "26.410381293679343,-80.10329290811285",
+                    "bounds": {
+                        "southWest": "26.351343120941795,-80.17848059121832",
+                        "northEast": "26.469419466416895,-80.02810522500738"
+                    },
+                    "children": [
+                        {
+                            "name": "Atlantic Avenue",
+                            "url": "https://cdn.getrydr.com/images/atlantic-ave.png",
+                            "zoom": 14,
+                            "tilt": 0,
+                            "center": "26.461733274796533,-80.07127806131109",
+                            "bounds": {
+                                "southWest": "26.454817819416657,-80.08668466989263",
+                                "northEast": "26.468648730176408,-80.05587145272955"
+                            }
+                        },
+                        {
+                            "name": "Mizner Park",
+                            "url": "https://cdn.getrydr.com/images/mizner-park.png",
+                            "zoom": 16,
+                            "tilt": 33.75,
+                            "center": "26.354118216467292,-80.08500933508253",
+                            "bounds": {
+                                "southWest": "26.346273387001634,-80.09535193304396",
+                                "northEast": "26.36196304593295,-80.0746667371211"
+                            }
+                        },
+                        {
+                            "name": "West Boca Raton",
+                            "url": "https://cdn.getrydr.com/images/west-boca.png",
+                            "zoom": 12,
+                            "tilt": 0,
+                            "center": "26.367386561616783,-80.1645743833003",
+                            "bounds": {
+                                "southWest": "26.341240131975802,-80.21710276464796",
+                                "northEast": "26.39353299125776,-80.11204600195265"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Miami & Miami Beach",
+                    "url": "https://cdn.getrydr.com/images/miami.png",
+                    "zoom": 11,
+                    "tilt": 0,
+                    "center": "25.7665712123546,-80.19207414035236",
+                    "bounds": {
+                        "southWest": "25.591262557081826,-80.38811143283283",
+                        "northEast": "25.94187986762737,-79.99603684787189"
+                    },
+                    "children": [
+                        {
+                            "name": "Brickell",
+                            "url": "https://cdn.getrydr.com/images/brickell.png",
+                            "zoom": 14,
+                            "tilt": 0,
+                            "center": "25.76560012824239,-80.19284304296104",
+                            "bounds": {
+                                "southWest": "25.752923355714614,-80.20563181554405",
+                                "northEast": "25.778276900770162,-80.18005427037804"
+                            }
+                        },
+                        {
+                            "name": "Coconut Grove",
+                            "url": "https://cdn.getrydr.com/images/coconut-grove.png",
+                            "zoom": 14,
+                            "tilt": 0,
+                            "center": "25.72968995413929,-80.24228151952354",
+                            "bounds": {
+                                "southWest": "25.716042839634277,-80.25807436620323",
+                                "northEast": "25.7433370686443,-80.22648867284386"
+                            }
+                        },
+                        {
+                            "name": "Kendall",
+                            "url": "https://cdn.getrydr.com/images/kendall.png",
+                            "zoom": 13.75,
+                            "tilt": 0,
+                            "center": "25.668066291642177,-80.35356912858771",
+                            "bounds": {
+                                "southWest": "25.627065075777,-80.41262064225958",
+                                "northEast": "25.70906750750735,-80.29451761491583"
+                            }
+                        },
+                        {
+                            "name": "Mid-Beach",
+                            "url": "https://cdn.getrydr.com/images/mid-beach.png",
+                            "zoom": 13.5,
+                            "tilt": 0,
+                            "center": "25.81150335541912,-80.12950863992586",
+                            "bounds": {
+                                "southWest": "25.793963638227652,-80.15191044961824",
+                                "northEast": "25.82904307261059,-80.10710683023348"
+                            }
+                        },
+                        {
+                            "name": "South Beach",
+                            "url": "https://cdn.getrydr.com/images/south-beach.png",
+                            "zoom": 14.5,
+                            "tilt": 0,
+                            "center": "25.779201325810305,-80.1359459415616",
+                            "bounds": {
+                                "southWest": "25.76289344516363,-80.16512837564363",
+                                "northEast": "25.79550920645698,-80.10676350747957"
+                            }
+                        },
+                        {
+                            "name": "Wynwood",
+                            "url": "https://cdn.getrydr.com/images/wynwood.png",
+                            "zoom": 14.75,
+                            "tilt": 0,
+                            "center": "25.803100813276323,-80.19893880761572",
+                            "bounds": {
+                                "southWest": "25.795489426927432,-80.20704980767675",
+                                "northEast": "25.81071219962521,-80.19082780755468"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "US Virgin Islands",
+            "url": "https://cdn.getrydr.com/images/st-john-usvi.jpg",
+            "center": "-64.732304,18.348660",
+            "bounds": {
+                "southWest": "-64.813431,18.294616",
+                "northEast": "-64.650353,18.373157"
+            },
+            "children": [
+                {
+                    "name": "St. John",
+                    "url": "https://cdn.getrydr.com/images/st-john-usvi.jpg",
+                    "zoom": 11,
+                    "tilt": 0,
+                    "center": "-64.732304,18.348660",
+                    "bounds": {
+                        "southWest": "-64.813431,18.294616",
+                        "northEast": "-64.650353,18.373157"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,1250 @@
+{
+	"info": {
+		"_postman_id": "84a36b69-4f70-429d-86c4-76f152bfc513",
+		"name": "RydrInitData",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "010_Init",
+			"item": [
+				{
+					"name": "001_MonitorControlFlow",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b895f41e-f880-4e7a-98f6-7551b5a85e8e",
+								"exec": [
+									"var xLoopCount = pm.environment.get(\"rydrloopCount\");",
+									"",
+									"if (xLoopCount) {",
+									"    postman.setNextRequest(\"100_ApiUsers\");",
+									"}",
+									"",
+									"var loopCount = 1;",
+									"",
+									"var xLoopCountInt = parseInt(xLoopCount);",
+									"",
+									"if (xLoopCountInt) {",
+									"    loopCount += xLoopCountInt",
+									"}",
+									"",
+									"pm.environment.set(\"rydrloopCount\", loopCount);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/monitor",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"monitor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "040_RydrFbPublisherProdApp",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "25994392-4c57-49c8-a483-4c7f649363d5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"Model\": {\n\t\t\"Id\": 0,\n\t\t\"Type\": \"Facebook\",\n\t\t\"AppId\": \"286022225400402\",\n\t\t\"AppSecret\": \"304743b8646df114be42df8a7734b98c\"\n\t}\n}\n"
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/publisherapps",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"publisherapps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "050_RydrFbPublisherTestApp",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "25994392-4c57-49c8-a483-4c7f649363d5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"Model\": {\n\t\t\"Id\": 0,\n\t\t\"Type\": \"Facebook\",\n\t\t\"AppId\": \"313209629397860\",\n\t\t\"AppSecret\": \"9c3f7f602e8feac128bfa191b21d353f\"\n\t}\n}\n"
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/publisherapps",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"publisherapps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "053_RydrIgPublisherDevApp",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "25994392-4c57-49c8-a483-4c7f649363d5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a931d574-6220-4061-8d7f-7555e3d91179",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"Model\": {\n\t\t\"Id\": 0,\n\t\t\"Type\": \"Instagram\",\n\t\t\"AppId\": \"932514243848089\",\n\t\t\"AppSecret\": \"2fac1b7a4140aa309a4d547b7555b2ca\"\n\t}\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/publisherapps",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"publisherapps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "100_ApiUsers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b96a4db6-f412-463f-a4af-fb9537ecb403",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"var myRydrUserApiKey = jsonData.apiKey;",
+									"",
+									"pm.environment.set(\"myRydrUserApiKey\", myRydrUserApiKey);",
+									"",
+									"var currentPublisherType = pm.iterationData.get(\"publishertype\");",
+									"",
+									"if (currentPublisherType == 'Instagram') {",
+									"    postman.setNextRequest(\"110_InstagramConnectUser\");",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{fullname}}\",\n    \"email\": \"{{email}}\",\n    \"apiKey\": \"{{apikey}}\"\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/authentication/register/apikey",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"authentication",
+								"register",
+								"apikey"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "105_FacebookConnectUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "33c90367-a47f-436d-a516-b48149a55ebe",
+								"exec": [
+									"postman.setNextRequest(\"999_Done\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{myRydrUserApiKey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accountId\": \"{{publisherid}}\",\n    \"authToken\": \"{{accesstoken}}\",\n    \"userName\": \"{{username}}\",\n    \"features\": -1\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/facebook/connectuser",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"facebook",
+								"connectuser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "110_InstagramConnectUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6662c8bf-9734-4c48-a7fc-4849948eafd7",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{myRydrUserApiKey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accountId\": \"{{publisherid}}\",\n    \"accessToken\": \"{{accesstoken}}\",\n    \"userName\": \"{{username}}\",\n    \"rydrAccountType\": \"{{rydraccountype}}\",\n    \"features\": -1\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/instagram/connectuser",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"instagram",
+								"connectuser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "999_Done",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0846a455-9c8b-4840-912e-c5081dcbf4f6",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/monitor",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"monitor"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{rydradminapikey}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9d0894a5-551e-44af-9ec0-a8e6f7df32fc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ec69eb5a-b094-4c03-b139-f764e16ee486",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "050_LinkAccounts",
+			"item": [
+				{
+					"name": "002_GetRydrUserAccount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "78b2b180-10a4-4e8e-a646-ea987d5b9b39",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"var myRydrPublisherAccountId = jsonData.result.publisherAccount.id;",
+									"var myRydrWorkspaceId = jsonData.result.connectInfo.workspaceId;",
+									"var myRydrUserApiKey = jsonData.result.connectInfo.apiKey;",
+									"",
+									"pm.environment.set(\"myRydrPublisherAccountId\", myRydrPublisherAccountId);",
+									"pm.environment.set(\"myRydrUserApiKey\", myRydrUserApiKey);",
+									"pm.environment.set(\"myRydrWorkspaceId\", myRydrWorkspaceId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{rydradminapikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/authentication/publisherinfo?PublisherType={{publishertype}}&PublisherId={{rydruserpublisherid}}",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"authentication",
+								"publisherinfo"
+							],
+							"query": [
+								{
+									"key": "PublisherType",
+									"value": "{{publishertype}}"
+								},
+								{
+									"key": "PublisherId",
+									"value": "{{rydruserpublisherid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "010_LinkAccounts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1c8ffcd7-b4a6-4d60-9d57-fa9faec78a2c",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f5e5759f-2f6d-408f-9adc-17c5d4691114",
+								"exec": [
+									"var myRydrUserApiKey = pm.environment.get(\"myRydrUserApiKey\");",
+									"pm.environment.set(\"rydrapikey\", myRydrUserApiKey);",
+									"",
+									"var myRydrWorkspaceId = pm.environment.get(\"myRydrWorkspaceId\");",
+									"pm.environment.set(\"rydrworkspaceid\", myRydrWorkspaceId);",
+									"",
+									"var myRydrPublisherAccountId = pm.environment.get(\"myRydrPublisherAccountId\");",
+									"pm.environment.set(\"rydrpublisheraccountid\", myRydrPublisherAccountId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"type": "text",
+								"value": "{{rydrworkspaceid}}"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"value": "{{rydrpublisheraccountid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"linkAccounts\": [\n        {\n            \"accountId\": \"{{publisherid}}\",\n            \"type\": \"{{publishertype}}\",\n            \"accountType\": \"{{accounttype}}\",\n            \"rydrAccountType\": {{rydraccounttype}},\n            \"profilePicture\": \"{{profilepicture}}\",\n            \"userName\": \"{{username}}\",\n            \"fullName\": \"{{fullname}}\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/publisheracct/link",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"publisheracct",
+								"link"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "100_CreateDeals",
+			"item": [
+				{
+					"name": "002_GetRydrUserAccount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "78b2b180-10a4-4e8e-a646-ea987d5b9b39",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"var myRydrPublisherAccountId = jsonData.result.publisherAccount.id;",
+									"var myRydrWorkspaceId = jsonData.result.connectInfo.workspaceId;",
+									"var myRydrUserApiKey = jsonData.result.connectInfo.apiKey;",
+									"",
+									"pm.environment.set(\"myRydrPublisherAccountId\", myRydrPublisherAccountId);",
+									"pm.environment.set(\"myRydrUserApiKey\", myRydrUserApiKey);",
+									"pm.environment.set(\"myRydrWorkspaceId\", myRydrWorkspaceId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{rydradminapikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"type": "text",
+								"value": "{{rydrpublisheraccountid}}"
+							},
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"value": "{{rydrworkspaceid}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/authentication/publisherinfo?PublisherType={{publishertype}}&PublisherId={{publisherid}}",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"authentication",
+								"publisherinfo"
+							],
+							"query": [
+								{
+									"key": "PublisherType",
+									"value": "{{publishertype}}"
+								},
+								{
+									"key": "PublisherId",
+									"value": "{{publisherid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "100_CreateDeals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1c8ffcd7-b4a6-4d60-9d57-fa9faec78a2c",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f5e5759f-2f6d-408f-9adc-17c5d4691114",
+								"exec": [
+									"var myRydrUserApiKey = pm.environment.get(\"myRydrUserApiKey\");",
+									"pm.environment.set(\"rydrapikey\", myRydrUserApiKey);",
+									"",
+									"var myRydrWorkspaceId = pm.environment.get(\"myRydrWorkspaceId\");",
+									"pm.environment.set(\"rydrworkspaceid\", myRydrWorkspaceId);",
+									"",
+									"var myRydrPublisherAccountId = pm.environment.get(\"myRydrPublisherAccountId\");",
+									"pm.environment.set(\"rydrpublisheraccountid\", myRydrPublisherAccountId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"type": "text",
+								"value": "{{rydrpublisheraccountid}}"
+							},
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"value": "{{rydrworkspaceid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"Model\": {\n\t\t\"Id\": 0,\n\t\t\"PublisherAccountId\": {{myRydrPublisherAccountId}},\n\t\t\"Description\": \"{{description}}\",\n\t\t\"Title\": \"{{title}}\",\n\t\t\"Value\": {{value}},\n\t\t\"Status\": \"{{dealstatus}}\",\n\t\t\"Place\": {\n\t\t\t\"Id\": 0,\n\t\t\t\"PublisherId\": \"{{placepublisherid}}\",\n\t\t\t\"PublisherType\": \"{{publishertype}}\",\n\t\t\t\"Name\": \"{{placename}}\",\n\t\t\t\"Address\": {\n\t\t\t\t\"Type\": \"Business\",\n\t\t\t\t\"Name\": \"{{placeaddressname}}\",\n\t\t\t\t\"Address1\": \"{{placeaddress1}}\",\n\t\t\t\t\"City\": \"{{placecity}}\",\n\t\t\t\t\"StateProvince\": \"{{placestate}}\",\n\t\t\t\t\"PostalCode\": \"{{placezip}}\",\n\t\t\t\t\"Latitude\": {{placeaddresslat}},\n\t\t\t\t\"Longitude\": {{placeaddresslon}}\n\t\t\t}\n\t\t},\n\t\t\"Restrictions\": [\n\t\t\t{\n\t\t\t\t\"Type\": \"MinFollowerCount\",\n\t\t\t\t\"Value\": {{minfollowercount}}\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Type\": \"MinAge\",\n\t\t\t\t\"Value\": {{minage}}\n\t\t\t}\n\t\t],\n\t\t\"ReceiveNotes\": \"{{receivenotes}}\",\n\t\t\"ReceiveType\": [\n\t\t\t{\n\t\t\t\t\"Type\": \"Story\",\n\t\t\t\t\"Quantity\": \"{{receivetypestories}}\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Type\": \"Post\",\n\t\t\t\t\"Quantity\": \"{{receivetypeposts}}\"\n\t\t\t}\n\t\t],\n\t\t\"MaxApprovals\": {{maxapprovals}},\n\t\t\"ApprovalNotes\": \"{{approvalnotes}}\",\n\t\t\"AutoApproveRequests\": {{autoapprove}},\n\t\t\"ExpirationDate\": \"{{expirationdate}}\"\n\t}\n}\n"
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/deals",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"deals"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "75f0a93a-cdb2-4644-bc41-1cce26bb66fc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "5ecdf207-5df8-4024-8c56-97437d53d625",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "110_RequestDeals",
+			"item": [
+				{
+					"name": "002_GetRydrUserAccount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "78b2b180-10a4-4e8e-a646-ea987d5b9b39",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"var myRydrPublisherAccountId = jsonData.result.publisherAccount.id;",
+									"var myRydrWorkspaceId = jsonData.result.connectInfo.workspaceId;",
+									"var myRydrUserApiKey = jsonData.result.connectInfo.apiKey;",
+									"",
+									"pm.environment.set(\"myRydrPublisherAccountId\", myRydrPublisherAccountId);",
+									"pm.environment.set(\"myRydrUserApiKey\", myRydrUserApiKey);",
+									"pm.environment.set(\"myRydrWorkspaceId\", myRydrWorkspaceId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{rydradminapikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"type": "text",
+								"value": "{{rydrworkspaceid}}"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"value": "{{rydrpublisheraccountid}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/authentication/publisherinfo?PublisherType={{publishertype}}&PublisherId={{publisherid}}",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"authentication",
+								"publisherinfo"
+							],
+							"query": [
+								{
+									"key": "PublisherType",
+									"value": "{{publishertype}}"
+								},
+								{
+									"key": "PublisherId",
+									"value": "{{publisherid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "050_GetDealPublisherAccount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "78b2b180-10a4-4e8e-a646-ea987d5b9b39",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"var dealPublisherAccountId = jsonData.result.publisherAccount.id;",
+									"",
+									"pm.environment.set(\"dealPublisherAccountId\", dealPublisherAccountId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "eeaa482d-cf59-4819-abad-71a45fa97202",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{rydradminapikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"type": "text",
+								"value": "{{rydrworkspaceid}}"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"value": "{{rydrpublisheraccountid}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/authentication/publisherinfo?PublisherType={{publishertype}}&PublisherId={{dealpublisherid}}",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"authentication",
+								"publisherinfo"
+							],
+							"query": [
+								{
+									"key": "PublisherType",
+									"value": "{{publishertype}}"
+								},
+								{
+									"key": "PublisherId",
+									"value": "{{dealpublisherid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "075_QueryPublishedDeals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d766bb3-1dde-4a02-a2ba-0199eb9073b8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"var dealId = 0;",
+									"",
+									"if (jsonData.results && jsonData.results.length) {",
+									"    dealId = jsonData.results[0].deal.id;",
+									"}",
+									"",
+									"pm.environment.set(\"currentDealId\", dealId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8108d756-1e3d-4a34-b55e-3a6878762529",
+								"exec": [
+									"var myRydrUserApiKey = pm.environment.get(\"myRydrUserApiKey\");",
+									"pm.environment.set(\"rydrapikey\", myRydrUserApiKey);",
+									"",
+									"var myRydrWorkspaceId = pm.environment.get(\"myRydrWorkspaceId\");",
+									"pm.environment.set(\"rydrworkspaceid\", myRydrWorkspaceId);",
+									"",
+									"var myRydrPublisherAccountId = pm.environment.get(\"myRydrPublisherAccountId\");",
+									"pm.environment.set(\"rydrpublisheraccountid\", myRydrPublisherAccountId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"type": "text",
+								"value": "{{rydrworkspaceid}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"value": "{{rydrpublisheraccountid}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/query/publisheddeals?publisherAccountId={{dealPublisherAccountId}}&userLatitude={{userlat}}&userLongitude={{userlon}}&latitude={{userlat}}&longitude={{userlon}}&miles=20&take=1",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"query",
+								"publisheddeals"
+							],
+							"query": [
+								{
+									"key": "publisherAccountId",
+									"value": "{{dealPublisherAccountId}}"
+								},
+								{
+									"key": "userLatitude",
+									"value": "{{userlat}}"
+								},
+								{
+									"key": "userLongitude",
+									"value": "{{userlon}}"
+								},
+								{
+									"key": "latitude",
+									"value": "{{userlat}}"
+								},
+								{
+									"key": "longitude",
+									"value": "{{userlon}}"
+								},
+								{
+									"key": "miles",
+									"value": "20"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Deals available for request/deals that can be requestsed (i.e. typically an influencer making this call)"
+					},
+					"response": []
+				},
+				{
+					"name": "100_RequestDeals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1c8ffcd7-b4a6-4d60-9d57-fa9faec78a2c",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f5e5759f-2f6d-408f-9adc-17c5d4691114",
+								"exec": [
+									"var myRydrUserApiKey = pm.environment.get(\"myRydrUserApiKey\");",
+									"pm.environment.set(\"rydrapikey\", myRydrUserApiKey);",
+									"",
+									"var myRydrWorkspaceId = pm.environment.get(\"myRydrWorkspaceId\");",
+									"pm.environment.set(\"rydrworkspaceid\", myRydrWorkspaceId);",
+									"",
+									"var myRydrPublisherAccountId = pm.environment.get(\"myRydrPublisherAccountId\");",
+									"pm.environment.set(\"rydrpublisheraccountid\", myRydrPublisherAccountId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Rydr-WorkspaceId",
+								"type": "text",
+								"value": "{{rydrworkspaceid}}"
+							},
+							{
+								"key": "X-Rydr-PublisherAccountId",
+								"value": "{{rydrpublisheraccountid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{rydrhost}}:{{rydrport}}/deals/{{currentDealId}}/requests",
+							"host": [
+								"{{rydrhost}}"
+							],
+							"port": "{{rydrport}}",
+							"path": [
+								"deals",
+								"{{currentDealId}}",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{rydrapikey}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "a5d186f1-db47-41bb-a87a-1a6f21be1457",
+				"type": "text/javascript",
+				"exec": [
+					"var gid = Date.now().toString().substring(5,10);",
+					"pm.environment.set(\"runId\", gid);",
+					"",
+					"postman.setEnvironmentVariable(\"utils\", () => {",
+					"    var getRandomFromArray = (fromArray, number) => {",
+					"        var result = new Array(number);",
+					"        var len = fromArray.length;",
+					"        var taken = new Array(len);",
+					"        ",
+					"        if (number > len) {",
+					"            return fromArray;",
+					"        }",
+					"        ",
+					"        while(number--) {",
+					"            var x = Math.floor(Math.random() * len);",
+					"            result[number] = fromArray[x in taken ? taken[x] : x];",
+					"            taken[x] = --len in taken ? taken[len] : len;",
+					"        }",
+					"        ",
+					"        return result;",
+					"    }",
+					"    return {",
+					"        funcs: {",
+					"            getRandomFromArray",
+					"        }",
+					"    };",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "468d09fb-1a43-4aff-9fb6-e81f8ee6e6ff",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Successful request\", function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,203,204]);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "0c7444d6-8644-481f-9465-c75d6b07bf62",
+			"key": "rydradminapikey",
+			"value": "coNvop4sZWzUISupyNDRNiq274Xc_nXxLCipYEA3ThK00e5E9HbTK4kTjgc0K5ABxuQ"
+		},
+		{
+			"id": "3fbf071a-2887-4e64-b663-12e2f96f3630",
+			"key": "rydrauthsecret",
+			"value": "Pb7~7_c6arYx2QDd778gSRttB-Q9PmYM9cq2~87bPxjwJNBxf3C-eKVp6n_KptTSk5wSwbE5Z~emj-FAghd"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

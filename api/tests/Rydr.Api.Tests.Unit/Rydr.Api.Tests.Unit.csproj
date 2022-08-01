@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <Configurations>Debug;Development;LocalDocker</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DefineConstants>TRACE;DEBUG;LOCAL;LOCALDEBUG</DefineConstants>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|AnyCPU'">
+        <DefineConstants>TRACE;REMOTE;DEVELOPMENT</DefineConstants>
+        <OutputPath>bin\Development\</OutputPath>
+        <Optimize>true</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>pdbonly</DebugType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LocalDocker|AnyCPU'">
+        <DefineConstants>TRACE;DEBUG;DOCKER;LOCAL;LOCALDOCKER</DefineConstants>
+        <OutputPath>bin\LocalDocker\</OutputPath>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+
+</Project>

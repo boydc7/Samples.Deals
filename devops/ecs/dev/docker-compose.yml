@@ -1,0 +1,11 @@
+version: "3.0"
+services:
+  rydrapi:
+    image: 933347060724.dkr.ecr.us-west-2.amazonaws.com/dev/rydr-api:latest
+    ports:
+      - "2080:2080"
+    healthcheck:
+      interval: 91s
+      retries: 1
+      timeout: 13s
+      test: curl --fail -s http://localhost:2080/monitor?format=json || exit 1

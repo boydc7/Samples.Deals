@@ -1,0 +1,26 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - dotnet restore src/Rydr.Api.Core/Rydr.Api.Core.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+      - dotnet restore src/Rydr.Api.Dto/Rydr.Api.Dto.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+      - dotnet restore src/Rydr.Api.Dto/Rydr.Api.QueryDto.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+      - dotnet restore src/Rydr.Api.Host/Rydr.Api.Host.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+      - dotnet restore src/Rydr.Api.Services/Rydr.Api.Services.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+      - dotnet restore src/Rydr.FbSdk/Rydr.FbSdk.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+      - dotnet restore src/Rydr.IgSdk/Rydr.IgSdk.csproj --ignore-failed-sources --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack --packages ../../packages
+  build:
+    commands:
+      - dotnet publish -c Release -o ../../bin src/Rydr.Api.Host/Rydr.Api.Host.csproj
+artifacts:
+  files:
+    # - bin/**/*
+    # - lib/scripts/**/*
+    # - appspec.yml
+    - bin/*
+    - *.json
+    - *.yml
+    - *.yaml
+cache:
+  paths:
+    - packages/**/*

@@ -1,0 +1,122 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <Configurations>Debug;Release;LocalDevelopment;LocalProduction;Development;LocalDocker</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <LangVersion>default</LangVersion>
+        <AssemblyName>rydrapi</AssemblyName>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DefineConstants>TRACE;DEBUG;LOCAL;LOCALDEBUG;</DefineConstants>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LocalProduction|AnyCPU'">
+        <DefineConstants>TRACE;DEBUG;LOCAL;LOCALPRODUCTION</DefineConstants>
+        <OutputPath>bin\LocalProduction\</OutputPath>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LocalDevelopment|AnyCPU'">
+        <DefineConstants>TRACE;DEBUG;LOCAL;LOCALDEVELOPMENT</DefineConstants>
+        <OutputPath>bin\LocalDevelopment\</OutputPath>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|AnyCPU'">
+        <DefineConstants>TRACE;REMOTE;DEVELOPMENT</DefineConstants>
+        <OutputPath>bin\Development\</OutputPath>
+        <Optimize>true</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>pdbonly</DebugType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DefineConstants>REMOTE;PRODUCTION;RELEASE</DefineConstants>
+        <OutputPath>bin\Release\</OutputPath>
+        <Optimize>true</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>pdbonly</DebugType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LocalDocker|AnyCPU'">
+        <DefineConstants>TRACE;DEBUG;DOCKER;LOCAL;LOCALDOCKER</DefineConstants>
+        <OutputPath>bin\LocalDocker\</OutputPath>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.Development.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="appsettings.LocalDevelopment.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="appsettings.LocalProduction.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="appsettings.Production.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="NLog.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <None Remove="rydr.rydr.sqlite" />
+        <Content Include="appsettings.LocalDocker.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <None Remove="xdealcontent.txt" />
+        <Content Include="xdealcontent.txt">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <None Remove="favicon.ico" />
+        <Content Include="favicon.ico">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="3.1.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.4" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.4" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+      <PackageReference Include="NLog.Extensions.Logging" Version="1.6.3" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Rydr.Api.Core\Rydr.Api.Core.csproj" />
+      <ProjectReference Include="..\Rydr.Api.Services\Rydr.Api.Services.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ServiceStack, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.dll</HintPath>
+      </Reference>
+      <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.Interfaces.dll</HintPath>
+      </Reference>
+      <Reference Include="ServiceStack.Kestrel, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.Kestrel.dll</HintPath>
+      </Reference>
+      <Reference Include="ServiceStack.Logging.NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.Logging.NLog.dll</HintPath>
+      </Reference>
+      <Reference Include="ServiceStack.Server, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.Server.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

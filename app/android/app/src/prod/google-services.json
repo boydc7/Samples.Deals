@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "770484616895",
+    "firebase_url": "https://rydr-flutter.firebaseio.com",
+    "project_id": "rydr-flutter",
+    "storage_bucket": "rydr-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770484616895:android:135336f08af5cd76",
+        "android_client_info": {
+          "package_name": "com.rydr.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfTPGevMlerH_1rw_qdXtiilaHLiHU1PI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,45 @@
+{
+  "executionRoleArn": "arn:aws:iam::933347060724:role/AWSServiceRoleEcsTask",
+  "containerDefinitions": [
+    {
+      "image": "<DEV-API-IMAGE-NAME>",
+      "essential": true,
+      "pseudoTerminal": false,
+      "readonlyRootFilesystem": false,
+      "privileged": false,
+      "name": "rydrapi",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "Fargate-Dev",
+          "awslogs-region": "us-west-2",
+          "awslogs-stream-prefix": "rydrapi"
+        }
+      },      
+      "portMappings": [
+        {
+          "hostPort": 2080,
+          "protocol": "tcp",
+          "containerPort": 2080
+        }
+      ],
+      "healthCheck": {
+        "retries": 1,
+        "command": [
+          "CMD-SHELL",
+          "curl --fail -s http://localhost:2080/monitor?format=json || exit 1"
+        ],
+        "timeout": 13,
+        "interval": 91
+      }
+    }
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "networkMode": "awsvpc",
+  "taskRoleArn": "arn:aws:iam::933347060724:role/AWSServiceRoleEcsTask",
+  "family": "Dev-RydrApi",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ]  
+}

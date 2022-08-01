@@ -1,0 +1,15 @@
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: "<TASK_DEFINITION>"
+        LoadBalancerInfo:
+          ContainerName: "rydrapi"
+          ContainerPort: 2080
+        PlatformVersion: "LATEST"
+        NetworkConfiguration:
+            awsvpcConfiguration:
+              subnets: ["subnet-0b8d365f9fddd38a0", "subnet-08bd4398b59202908"]
+              securityGroups: ["sg-013acbcc18cce74a0","sg-0b9ad7c3fe8115651"]
+              assignPublicIp: "DISABLED"

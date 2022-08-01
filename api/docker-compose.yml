@@ -1,0 +1,65 @@
+# NOTE: This is meant for creating a local/entirely contained docker environment/build/run the api in - on AWS, we use ECS for main 
+# docker compose files are in /lib/ecs/... and related paths
+version: "3.7"
+services:
+  mysql:
+    image: mysql
+    container_name: rydrmysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    # If you want to expose mysql to the host...
+    ports:
+      - "2083:3306"
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=7ygJRWTn2Wb42UgpF56Aj7N648N8P4dZ7C2
+      - MYSQL_DATABASE=rydr
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+    container_name: rydres
+    environment:
+      - discovery.type=single-node
+    # If you want to expose elasticsearch to the host...
+    ports:
+      - "2089:9200"
+    expose:
+      - "9200"
+    healthcheck:
+      interval: 9s
+      retries: 2
+      timeout: 8s
+      test: curl --fail -s http://localhost:9200/_cat/health || exit 1
+  redis:
+    image: redis
+    container_name: rydrredis
+    ports:
+      - "2086:6379"
+    expose:
+      - "6379"
+  dynamodb:
+    image: amazon/dynamodb-local
+    container_name: rydrdynamo
+    # If you want to expose dynamodb to the host...
+    ports:
+      - "2088:8000"
+    expose:
+      - "8000"
+  rydrapi:
+    build:
+      context: .
+      dockerfile: lib/dockerfiles/rydrapi.local.Dockerfile
+    restart: on-failure
+    container_name: rydrapi
+    ports:
+      - "2080:2080"
+    depends_on:
+      - redis
+      - elasticsearch
+      - dynamodb
+      - mysql
+    healthcheck:
+      interval: 99s
+      retries: 2
+      timeout: 19s
+      test: curl --fail -s http://localhost:2080/monitor?format=json || exit 1

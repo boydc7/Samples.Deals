@@ -1,0 +1,88 @@
+parentname,name,ignore,rewriteparent,rewritename
+*,Aircraft,,,Airplane
+*,Apparel,,,Clothing
+*,Bike,,,Bicycle
+*,Canine,,,Dog
+*,Car,,,Automobile
+*,Coast,,,Nature
+*,Footwear,,,Clothing
+*,Housing,,,House
+*,Mammal,,,Animal
+*,Ocean,,,Water
+*,Outdoors,,,Nature
+*,Pet,,,Animal
+*,Sea,,,Water
+*,Sports,,,Sport
+*,Team Sport,,,Sport
+,Airplane,,Transportation,Airplane
+Animal,Pet,true,,
+,Apparel,true,,
+,Back,true,,
+,Banister,true,,
+Break,Pancake,,Food,Pancake
+Building,City,true,,
+,Building,true,,
+Clothing,Jacket,,Clothing,Coat
+,Door,true,,
+Door,Folding Door,true,,
+Face,Smile,true,,
+Female,Girl,true,,
+,Handrail,true,,
+,Human,true,,
+Land,Jungle,,Nature,Jungle
+Land,Rainforest,,Nature,Rainforest
+Landscape,Aerial View,,Nature,Aerial View
+Machine,Car Wheel,true,,
+Machine,Wheel,true,,
+Machine,Spoke,true,,
+Male,Boy,true,,
+,Machine,true,,
+Ocean,Beach,,Nature,Beach
+Ocean,Coast,,Nature,Coast
+,Person,true,,
+Person,Acrobatic,,Sport,Acrobatics
+Person,Athlete,,Sport,Athletics
+Person,Exercise,,Sport,Exercise
+Person,Face,true,,
+Person,Female,true,,
+Person,Male,true,,
+Person,Man,true,,
+Person,People,true,,
+Person,Photography,,"  ",Photography
+Person,Woman,true,,
+Person,Skating,,Sport,Skating
+Person,Ice Skating,,Sport,Skating
+Person,Sport,,"  ",Sport
+Person,Sports,,"  ",Sport
+Plant,Arecaceae,true,,
+Plant,Palm Tree,,Nature,Palm Tree
+,Plant,true,,
+Sea,Beach,,Nature,Beach
+Sea,Coast,,Nature,Coast
+Skating,Rink,,Building,Rink
+Sky,Sunrise,,Nature,Sunrise
+Sky,Sunset,,Nature,Sunset
+Sky,Sun,,Nature,Sun
+Sport,Fitness,,Sport,Exercise
+Sport,Working Out,,Sport,Exercise
+Sport,Team Sport,true ,,
+,Strap,true,,
+,Text,true,,
+Text,Calendar,true,,
+Text,Label,true,,
+Text,Page,true,,
+Tire,Car Wheel,true,,
+,Tire,true,,
+Transportation,Bike,,Transportation,Bicycle
+Transportation,Vehicle,,Transportation,Automobile
+Urban,City,,"  ",City
+,Urban,,"  ",City
+Vehicle,Airplane,,Transportation,Airplane
+Vehicle,Automobile,,Transportation,Automobile
+Vehicle,Boat,,Transportation,Boat
+Vehicle,Car,,Transportation,Automobile
+Water,Shoreline,,Nature,Water
+,Water,,Nature,Water
+Wheel,Alloy Wheel,true,,
+,Wood,true,,
+Working Out,Fitness,,Sport,Exercise

@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "node_modules": true,
+      "dist": true,
+      ".vscode": true,
+      ".dart_tool": true
+    }
+  },
+  "launch": {
+    "configurations": [
+      {
+        "name": "FlutterWeb",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "flutterMode": "debug",
+        "args": ["--web-hostname", "localhost", "--web-port", "55080"]
+      },
+      {
+        "name": "WebLocalHostApi",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main_local.dart",
+        "flutterMode": "debug",
+        "args": ["--web-hostname", "localhost", "--web-port", "55080"]
+      }
+    ],
+    "compounds": []
+  }
+}

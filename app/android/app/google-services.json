@@ -1,0 +1,72 @@
+{
+  "project_info": {
+    "project_number": "333272437668",
+    "firebase_url": "https://rydr-dev.firebaseio.com",
+    "project_id": "rydr-dev",
+    "storage_bucket": "rydr-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333272437668:android:9194ff557b86d56cf0a731",
+        "android_client_info": {
+          "package_name": "com.rydr.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "333272437668-qn1otqs0ldjr6ofctb0doq4jsfvep66g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rydr.app",
+            "certificate_hash": "7be67aec9ddd71922dd777e771570f0ac028eabb"
+          }
+        },
+        {
+          "client_id": "333272437668-oddj51qt2a3b8epil6lrddsr3cdka798.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rydr.app",
+            "certificate_hash": "0ecd0dcbf0b784239585e1a1f0b970a910ae2f45"
+          }
+        },
+        {
+          "client_id": "333272437668-cuvtl7irdae3crqv6p58ji1t11vi0233.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rydr.app",
+            "certificate_hash": "56a67f3559d1ed2109724f12975c027bdf383cf0"
+          }
+        },
+        {
+          "client_id": "333272437668-ss2qrpb2rr08uhb3pr599kdbrvehj4hm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfwn7YHz-Ez7KKTfMH9d0N2HgX-VaVm7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "333272437668-ss2qrpb2rr08uhb3pr599kdbrvehj4hm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "333272437668-ihs8opq3q3uldqkcqbv9vnnirs1hjpli.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rydr.app",
+                "app_store_id": "1480064664"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

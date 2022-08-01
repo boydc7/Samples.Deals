@@ -1,0 +1,1 @@
+The config files here should match firebase remoteconfig settings / props

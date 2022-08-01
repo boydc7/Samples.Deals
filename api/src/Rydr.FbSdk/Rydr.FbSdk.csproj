@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <Configurations>Debug;Release;Development</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DefineConstants>DEBUG;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DefineConstants />
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
+      <DefineConstants />
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="GeoCoordinate.NetStandard1" Version="1.0.1" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.Interfaces.dll</HintPath>
+      </Reference>
+      <Reference Include="ServiceStack.Text, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\lib\servicestack\ServiceStack.Text.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Rydr.Api.Dto\Rydr.Api.Dto.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="245px" height="245px" viewBox="0 0 245 245" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Group 7</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="95.1043057%" y1="5.94759272%" x2="30.0581135%" y2="69.2385637%" id="linearGradient-1">
+            <stop stop-color="#4FAFFF" offset="0%"></stop>
+            <stop stop-color="#0085F2" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-7" transform="translate(3.500000, 2.539106)">
+            <circle id="Oval-Copy" stroke="#2196F3" stroke-width="6" cx="119" cy="119.930233" r="96.4651163"></circle>
+            <line x1="215.465116" y1="119.930233" x2="237.604651" y2="119.930233" id="Line-4" stroke="#2196F3" stroke-width="6" stroke-linecap="round"></line>
+            <line x1="108.325581" y1="12.3953488" x2="130.465116" y2="12.3953488" id="Line-4-Copy-2" stroke="#2196F3" stroke-width="6" stroke-linecap="round" transform="translate(119.395349, 12.395349) rotate(90.000000) translate(-119.395349, -12.395349) "></line>
+            <line x1="108.325581" y1="227.465116" x2="130.465116" y2="227.465116" id="Line-4-Copy-3" stroke="#2196F3" stroke-width="6" stroke-linecap="round" transform="translate(119.395349, 227.465116) rotate(90.000000) translate(-119.395349, -227.465116) "></line>
+            <line x1="0.395348837" y1="119.930233" x2="22.5348837" y2="119.930233" id="Line-4-Copy" stroke="#2196F3" stroke-width="6" stroke-linecap="round"></line>
+            <path d="M112.815414,125.824312 L112.815414,161.280097 C112.815414,164.041521 115.05399,166.280097 117.815414,166.280097 C119.767387,166.280097 121.540891,165.144165 122.357198,163.371077 L156.930442,88.2750798 C158.085259,85.7667216 156.987996,82.797132 154.479638,81.6423158 C153.162175,81.0357725 151.646255,81.0311938 150.325152,81.6297676 L73.8712673,116.26998 C71.3559789,117.409622 70.2407979,120.37253 71.3804407,122.887818 C72.1905354,124.675766 73.9718645,125.824312 75.9347731,125.824312 L112.815414,125.824312 L112.815414,125.824312 Z" id="Path-3" fill="url(#linearGradient-1)"></path>
+        </g>
+    </g>
+</svg>

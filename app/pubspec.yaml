@@ -1,0 +1,167 @@
+name: rydr_app
+description: A new Flutter project.
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# Read more about versioning at semver.org.
+version: 1.0.1+4
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  firebase_auth: 0.15.3
+  firebase_crashlytics: ^0.1.3
+  firebase_analytics: ^5.0.11
+  firebase_messaging: ^6.0.12
+  firebase_performance: ^0.3.1+7
+  firebase_remote_config: ^0.3.0+3
+  firebase_dynamic_links: ^0.5.0+11
+  shared_preferences: ^0.5.6+2
+  url_launcher: ^5.4.2
+  intl: ^0.16.1
+  google_maps_flutter: ^0.5.24+1
+  flutter_facebook_login: ^3.0.0
+  timeago: ^2.0.26
+  simple_animations: ^1.3.9
+  package_info: ^0.4.0+14
+  cached_network_image: ^2.0.0
+  share: ^0.6.3+6
+  fl_chart: ^0.8.3
+  flutter_app_badger: ^1.1.2
+  shimmer: ^1.1.0
+  flutter_svg: ^0.17.3
+  fluster: ^1.1.2
+  rxdart: ^0.23.1
+  location_permissions: ^2.0.4+1
+  location: ^3.0.2
+  logger: ^0.8.3
+  dio: ^3.0.9
+  dio_http_cache: ^0.2.6
+  video_player: ^0.10.8+1
+  geocoder: ^0.2.1
+  connectivity: ^0.4.8+1
+  sentry: ^3.0.1
+  device_info: 0.4.1+5
+  version: ^1.0.3
+  mime: ^0.9.6+3
+  image_picker: ^0.6.4
+  http: ^0.12.0+4
+  percent_indicator: ^2.1.3
+
+  # note, we remove certain permissions in podfile
+  permission_handler: ^5.0.0+hotfix.3  
+  google_sign_in: ^3.2.2
+  apple_sign_in: ^0.1.0
+  webview_flutter: ^0.3.21
+
+# due to: https://github.com/FirebaseExtended/flutterfire/issues/2084
+dependency_overrides:
+  firebase_core: 0.4.4  
+
+dev_dependencies:
+
+# For information on the generic Dart part of this file, see the
+# following page: https://www.dartlang.org/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/icon-verified-account.png
+    - assets/rydr-logo.png
+    - assets/connect-profile_dark.png
+    - assets/connect-profile_light.png
+    - assets/switch-prof_dark.png
+    - assets/switch-prof_light.png
+    - assets/access-location.svg
+    - assets/facebook-1.png
+    - assets/facebook-2.png
+    - assets/facebook-3.png
+    - assets/marker.png
+    - assets/marker-auto.png
+    - assets/marker-blank.png
+    - assets/marker-place.png
+    - assets/marker-invite.png
+    - assets/marker-deal.png
+    - assets/marker-virtual.png
+    - assets/marker-event.png
+    - assets/marker-eventInvite.png
+    - assets/marker-ageRestricted.png
+    - assets/icons/access-location-marker.svg
+    - assets/icons/access-notifications.svg
+    - assets/icons/noRequests.png
+    - assets/icons/google-icon.png
+    - assets/icons/instagram-story-icon.png
+    - assets/icons/instagram-logo-gradient.png
+    - assets/icons/requests.svg
+    - assets/icons/requests-active.svg
+    - assets/icons/dashboard.svg
+    - assets/icons/dashboard-active.svg
+    - assets/icons/completed.svg
+    - assets/icons/completed-active.svg
+    - assets/icons/in-progress.svg
+    - assets/icons/in-progress-active.svg
+    - assets/icons/marketplace.svg
+    - assets/icons/marketplace-active.svg
+    - assets/icons/mustache-icon.svg
+    - assets/icons/rydr-logo.svg
+    - assets/icons/rydr-r.svg
+    - assets/icons/rydr-circle.svg
+    - assets/icons/brain-icon.svg
+    - assets/icons/brain-icon-big-dark.svg
+    - assets/icons/brain-icon-big-light.svg
+    - assets/icons/map-icon.svg
+    - assets/icons/map-dark-icon.svg
+    - assets/icons/pro-icon.png
+    - assets/icons/post-icon.svg
+    - assets/icons/post-req-icon.svg
+    - assets/icons/post-sug-icon.svg
+    - assets/icons/story-icon.svg
+    - assets/config/map_config.json
+    - assets/config/map_available_locations.json
+    - assets/config/map_style.json
+    - assets/config/tags_publishers.json
+    - assets/config/tags_deals.json
+    - assets/config/tags_deals_filters.json
+
+  #  - images/a_dot_ham.jpeg
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.io/assets-and-images/#resolution-aware.
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.io/assets-and-images/#from-packages
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: FontAwesomeBrands
+      fonts:
+        - asset: assets/fa-brands-400.otf
+          weight: 400
+    - family: FontAwesomeSolid
+      fonts:
+        - asset: assets/fa-solid-900.otf
+          weight: 900
+    - family: FontAwesomeRegular
+      fonts:
+        - asset: assets/fa-regular-400.otf
+          weight: 400
+    - family: FontAwesomeLight
+      fonts:
+        - asset: assets/fa-light-300.otf
+          weight: 300
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.io/custom-fonts/#from-packages

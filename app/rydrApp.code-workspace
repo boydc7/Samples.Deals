@@ -1,0 +1,50 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      ".vscode": true,
+      ".dart_tool": true
+    }
+  },
+  "launch": {
+    "configurations": [
+      {
+        "name": "Dev",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main_dev.dart",
+        "flutterMode": "debug",
+        "args": ["--flavor", "dev"]
+      },
+      {
+        "name": "LocalHostApi",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main_local.dart",
+        "flutterMode": "debug",
+        "args": ["--flavor", "dev"]
+      },
+      {
+        "name": "LocalLanApi",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main_lan.dart",
+        "flutterMode": "debug",
+        "args": ["--flavor", "dev"]
+      },
+      {
+        "name": "Prod",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main_prod.dart",
+        "flutterMode": "debug",
+        "args": ["--flavor", "prod"]
+      }
+    ],
+    "compounds": []
+  }
+}

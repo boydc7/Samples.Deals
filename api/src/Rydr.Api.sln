@@ -1,0 +1,213 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{724BD4BF-B635-44F1-B9B4-7D68210C4744}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{6BB5B333-6742-4909-904D-A43C1838C51D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{46EFEE8E-52E6-4CDD-AD53-5911D89536D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Host", "Rydr.Api.Host\Rydr.Api.Host.csproj", "{3EC41CC1-6108-45A5-B4E0-18199D842617}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Services", "Rydr.Api.Services\Rydr.Api.Services.csproj", "{E65B8E26-12A3-4130-9009-76049A3121BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Dto", "Rydr.Api.Dto\Rydr.Api.Dto.csproj", "{66A61881-86F3-41C8-99C9-2F438D786CFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Core", "Rydr.Api.Core\Rydr.Api.Core.csproj", "{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Tests.Unit", "..\tests\Rydr.Api.Tests.Unit\Rydr.Api.Tests.Unit.csproj", "{F877A5DB-24EA-4A6C-B920-5B7479F27B60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Tests.Integration", "..\tests\Rydr.Api.Tests.Integration\Rydr.Api.Tests.Integration.csproj", "{54C47528-546F-4783-B9AA-33EDD4A86A0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.FbSdk", "Rydr.FbSdk\Rydr.FbSdk.csproj", "{ECBD6819-8B21-4B41-985A-25E67F143866}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.Tests.Shared", "..\tests\Rydr.Api.Tests.Shared\Rydr.Api.Tests.Shared.csproj", "{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{1A76AAF4-EB29-42A1-BB4F-9B2E7C159EF9}"
+ProjectSection(SolutionItems) = preProject
+	..\docker-compose.yml = ..\docker-compose.yml
+	..\buildspec-docker-dev.yml = ..\buildspec-docker-dev.yml
+	..\buildspec-source-dev.yml = ..\buildspec-source-dev.yml
+	..\docker-up-local.sh = ..\docker-up-local.sh
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DockerFiles", "DockerFiles", "{B8D7D79B-1E64-47FA-8FB1-CD07462528A8}"
+ProjectSection(SolutionItems) = preProject
+	..\lib\dockerfiles\docker-clean.sh = ..\lib\dockerfiles\docker-clean.sh
+	..\lib\dockerfiles\nginx.local.Dockerfile = ..\lib\dockerfiles\nginx.local.Dockerfile
+	..\lib\dockerfiles\nginx.prod.Dockerfile = ..\lib\dockerfiles\nginx.prod.Dockerfile
+	..\lib\dockerfiles\rydrapi.local.Dockerfile = ..\lib\dockerfiles\rydrapi.local.Dockerfile
+	..\lib\dockerfiles\rydrapi.prod.Dockerfile = ..\lib\dockerfiles\rydrapi.prod.Dockerfile
+	..\lib\dockerfiles\nginx.dev.Dockerfile = ..\lib\dockerfiles\nginx.dev.Dockerfile
+	..\lib\dockerfiles\rydrapi.dev.Dockerfile = ..\lib\dockerfiles\rydrapi.dev.Dockerfile
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AwsEcs", "AwsEcs", "{248C493E-AE5A-4989-A821-B01D93741A7D}"
+ProjectSection(SolutionItems) = preProject
+	..\..\devops\ecs\aws-cli-config.sh = ..\..\devops\ecs\aws-cli-config.sh
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nginx", "Nginx", "{A5168BD1-2CA5-407D-9969-ACE89A281765}"
+ProjectSection(SolutionItems) = preProject
+	..\lib\nginx-proxy\nginx.local.conf = ..\lib\nginx-proxy\nginx.local.conf
+	..\lib\nginx-proxy\nginx.prod.conf = ..\lib\nginx-proxy\nginx.prod.conf
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.Api.QueryDto", "Rydr.Api.QueryDto\Rydr.Api.QueryDto.csproj", "{C3D3447C-658F-4411-ABD9-CECA19CB6792}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev", "Dev", "{F041A40E-8E24-4F29-B031-6535CC5241B8}"
+ProjectSection(SolutionItems) = preProject
+	..\..\devops\ecs\dev\aws-ecs-config.sh = ..\..\devops\ecs\dev\aws-ecs-config.sh
+	..\..\devops\ecs\dev\docker-compose.yml = ..\..\devops\ecs\dev\docker-compose.yml
+	..\..\devops\ecs\dev\ecs-params.yml = ..\..\devops\ecs\dev\ecs-params.yml
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rydr.ActiveCampaign", "Rydr.ActiveCampaign\Rydr.ActiveCampaign.csproj", "{8DE76C97-D061-491E-B44A-4B7EDC22739A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Development|Any CPU = Development|Any CPU
+		LocalDevelopment|Any CPU = LocalDevelopment|Any CPU
+		LocalProduction|Any CPU = LocalProduction|Any CPU
+		LocalDocker|Any CPU = LocalDocker|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.Development|Any CPU.Build.0 = Development|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.LocalDevelopment|Any CPU.ActiveCfg = LocalDevelopment|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.LocalDevelopment|Any CPU.Build.0 = LocalDevelopment|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.LocalProduction|Any CPU.ActiveCfg = LocalProduction|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.LocalProduction|Any CPU.Build.0 = LocalProduction|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{3EC41CC1-6108-45A5-B4E0-18199D842617}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.Development|Any CPU.Build.0 = Development|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.LocalDevelopment|Any CPU.ActiveCfg = LocalDevelopment|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.LocalDevelopment|Any CPU.Build.0 = LocalDevelopment|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.LocalProduction|Any CPU.ActiveCfg = LocalProduction|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.LocalProduction|Any CPU.Build.0 = LocalProduction|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{E65B8E26-12A3-4130-9009-76049A3121BC}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.Development|Any CPU.Build.0 = Development|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.LocalDevelopment|Any CPU.ActiveCfg = LocalDevelopment|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.LocalDevelopment|Any CPU.Build.0 = LocalDevelopment|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.LocalProduction|Any CPU.ActiveCfg = LocalProduction|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.LocalProduction|Any CPU.Build.0 = LocalProduction|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{66A61881-86F3-41C8-99C9-2F438D786CFB}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.Development|Any CPU.Build.0 = Development|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.LocalDevelopment|Any CPU.ActiveCfg = LocalDevelopment|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.LocalDevelopment|Any CPU.Build.0 = LocalDevelopment|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.LocalProduction|Any CPU.ActiveCfg = LocalProduction|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.LocalProduction|Any CPU.Build.0 = LocalProduction|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.Release|Any CPU.ActiveCfg = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.Release|Any CPU.Build.0 = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.Development|Any CPU.Build.0 = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.LocalDevelopment|Any CPU.ActiveCfg = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.LocalDevelopment|Any CPU.Build.0 = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.LocalProduction|Any CPU.ActiveCfg = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.LocalProduction|Any CPU.Build.0 = Development|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.Release|Any CPU.ActiveCfg = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.Release|Any CPU.Build.0 = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.Development|Any CPU.Build.0 = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.LocalDevelopment|Any CPU.ActiveCfg = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.LocalDevelopment|Any CPU.Build.0 = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.LocalProduction|Any CPU.ActiveCfg = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.LocalProduction|Any CPU.Build.0 = Development|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.Development|Any CPU.Build.0 = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.LocalDevelopment|Any CPU.ActiveCfg = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.LocalDevelopment|Any CPU.Build.0 = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.LocalProduction|Any CPU.ActiveCfg = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.LocalProduction|Any CPU.Build.0 = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.LocalDocker|Any CPU.ActiveCfg = Development|Any CPU
+		{ECBD6819-8B21-4B41-985A-25E67F143866}.LocalDocker|Any CPU.Build.0 = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.Development|Any CPU.Build.0 = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.LocalDevelopment|Any CPU.ActiveCfg = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.LocalDevelopment|Any CPU.Build.0 = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.LocalProduction|Any CPU.ActiveCfg = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.LocalProduction|Any CPU.Build.0 = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.Release|Any CPU.ActiveCfg = Development|Any CPU
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6}.Release|Any CPU.Build.0 = Development|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.Development|Any CPU.Build.0 = Development|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.LocalDevelopment|Any CPU.ActiveCfg = LocalDevelopment|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.LocalDevelopment|Any CPU.Build.0 = LocalDevelopment|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.LocalProduction|Any CPU.ActiveCfg = LocalProduction|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.LocalProduction|Any CPU.Build.0 = LocalProduction|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.LocalDocker|Any CPU.ActiveCfg = LocalDocker|Any CPU
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792}.LocalDocker|Any CPU.Build.0 = LocalDocker|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.Development|Any CPU.Build.0 = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.LocalDevelopment|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.LocalDevelopment|Any CPU.Build.0 = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.LocalProduction|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.LocalProduction|Any CPU.Build.0 = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.LocalDocker|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A}.LocalDocker|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3EC41CC1-6108-45A5-B4E0-18199D842617} = {724BD4BF-B635-44F1-B9B4-7D68210C4744}
+		{E65B8E26-12A3-4130-9009-76049A3121BC} = {724BD4BF-B635-44F1-B9B4-7D68210C4744}
+		{66A61881-86F3-41C8-99C9-2F438D786CFB} = {6BB5B333-6742-4909-904D-A43C1838C51D}
+		{B8CBB4DF-7C8E-41C1-955D-F67E26E0A7D8} = {6BB5B333-6742-4909-904D-A43C1838C51D}
+		{F877A5DB-24EA-4A6C-B920-5B7479F27B60} = {46EFEE8E-52E6-4CDD-AD53-5911D89536D7}
+		{54C47528-546F-4783-B9AA-33EDD4A86A0E} = {46EFEE8E-52E6-4CDD-AD53-5911D89536D7}
+		{ECBD6819-8B21-4B41-985A-25E67F143866} = {6BB5B333-6742-4909-904D-A43C1838C51D}
+		{9B8A00C0-BA2F-4FAA-8396-75D08BDDA4C6} = {46EFEE8E-52E6-4CDD-AD53-5911D89536D7}
+		{B8D7D79B-1E64-47FA-8FB1-CD07462528A8} = {1A76AAF4-EB29-42A1-BB4F-9B2E7C159EF9}
+		{248C493E-AE5A-4989-A821-B01D93741A7D} = {1A76AAF4-EB29-42A1-BB4F-9B2E7C159EF9}
+		{A5168BD1-2CA5-407D-9969-ACE89A281765} = {1A76AAF4-EB29-42A1-BB4F-9B2E7C159EF9}
+		{C3D3447C-658F-4411-ABD9-CECA19CB6792} = {6BB5B333-6742-4909-904D-A43C1838C51D}
+		{F041A40E-8E24-4F29-B031-6535CC5241B8} = {248C493E-AE5A-4989-A821-B01D93741A7D}
+		{8DE76C97-D061-491E-B44A-4B7EDC22739A} = {6BB5B333-6742-4909-904D-A43C1838C51D}
+	EndGlobalSection
+EndGlobal

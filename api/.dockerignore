@@ -1,0 +1,15 @@
+.git
+**/*.sqlite
+**/Obj/
+**/obj/
+**/bin/
+**/Bin/
+*.user
+*.vspscc
+*.vssscc
+*.suo
+*.cache
+*.docstates
+**/.idea/
+*DS_Store
+*.log

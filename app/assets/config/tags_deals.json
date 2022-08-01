@@ -1,0 +1,40 @@
+{
+    "tags": [
+        {
+            "key": "category",
+            "value": "Featured"
+        },
+        {
+            "key": "category",
+            "value": "Nightlife"
+        },
+        {
+            "key": "category",
+            "value": "Drinks"
+        },
+        {
+            "key": "category",
+            "value": "Fitness"
+        },
+        {
+            "key": "category",
+            "value": "Breakfast"
+        },
+        {
+            "key": "category",
+            "value": "Lunch"
+        },
+        {
+            "key": "category",
+            "value": "Dinner"
+        },
+        {
+            "key": "category",
+            "value": "Coffee"
+        },
+        {
+            "key": "category",
+            "value": "Take Out"
+        }
+    ]
+}

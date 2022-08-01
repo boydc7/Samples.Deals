@@ -1,0 +1,16 @@
+PROD:
+aws logs describe-log-streams --log-group-name Fargate-Prod --query 'logStreams[?lastIngestionTime<=`1580800000000`].logStreamName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-stream --log-group-name Fargate-Prod --log-stream-name $x; done
+
+aws logs describe-log-streams --log-group-name Fargate-Prod --query 'logStreams[?starts_with(logStreamName,`nginx`)].logStreamName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-stream --log-group-name Fargate-Prod --log-stream-name $x; done
+
+aws logs describe-log-streams --log-group-name Fargate-Prod --query 'logStreams[?starts_with(logStreamName,`cwagent`)].logStreamName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-stream --log-group-name Fargate-Prod --log-stream-name $x; done
+
+
+
+DEV:
+aws logs describe-log-streams --log-group-name Fargate-Dev --query 'logStreams[?lastIngestionTime<=`1581000000000`].logStreamName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-stream --log-group-name Fargate-Dev --log-stream-name $x; done
+
+aws logs describe-log-streams --log-group-name Fargate-Dev --query 'logStreams[?starts_with(logStreamName,`nginx`)].logStreamName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-stream --log-group-name Fargate-Dev --log-stream-name $x; done
+
+aws logs describe-log-streams --log-group-name Fargate-Dev --query 'logStreams[?starts_with(logStreamName,`cwagent`)].logStreamName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-stream --log-group-name Fargate-Dev --log-stream-name $x; done
+

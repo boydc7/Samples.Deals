@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rydr</string>
+    <string name="facebook_app_id">286022225400402</string>
+    <string name="fb_login_protocol_scheme">fb286022225400402</string>
+    <string name="rydr_in_host">in.getrydr.com</string>
+    <string name="gcp_mapapi_key">AIzaSyDDGmjNb-aySn70IewXqHIdOsh1OAWuRHw</string>
+</resources>

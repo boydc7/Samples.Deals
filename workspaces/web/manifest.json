@@ -1,0 +1,9 @@
+{
+  "name": "RYDR Workspaces",
+  "short_name": "rydrworkspaces",
+  "start_url": "/",
+  "display": "standalone",
+  "description": "RYDR Workspaces site",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}

@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to ECR...
+      - aws --version
+      - $(aws ecr get-login --no-include-email --region us-west-2)
+      - REPOSITORY_URI=933347060724.dkr.ecr.us-west-2.amazonaws.com/dev/rydr-api
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+  build:
+    commands:
+      - echo Building api image...          
+      - docker build -f lib/dockerfiles/rydrapi.dev.Dockerfile -t dev/rydr-api -t $REPOSITORY_URI .
+      # - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Pushing image to ECR...
+      - docker push $REPOSITORY_URI
+      # - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Cleaning ECR...
+      - aws ecr batch-delete-image --repository-name dev/rydr-api --image-ids $(aws ecr list-images --repository-name dev/rydr-api --filter tagStatus=UNTAGGED --query 'imageIds[*]'| tr -d " \t\n\r") || exit 0
