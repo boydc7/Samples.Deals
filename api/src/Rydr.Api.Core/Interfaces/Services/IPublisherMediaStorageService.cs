@@ -1,21 +1,18 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Rydr.Api.Core.Models.Doc;
 
-namespace Rydr.Api.Core.Interfaces.Services
+namespace Rydr.Api.Core.Interfaces.Services;
+
+public interface IPublisherMediaStorageService
 {
-    public interface IPublisherMediaStorageService
-    {
-        Task StoreAsync(IEnumerable<DynPublisherMediaStat> stats);
-    }
+    Task StoreAsync(IEnumerable<DynPublisherMediaStat> stats);
+}
 
-    public interface IPublisherMediaSingleStorageService
-    {
-        Task StoreAsync(DynPublisherMediaStat stat);
-    }
+public interface IPublisherMediaSingleStorageService
+{
+    Task StoreAsync(DynPublisherMediaStat stat);
+}
 
-    public interface IPublisherMediaStatDecorator
-    {
-        IAsyncEnumerable<DynPublisherMediaStat> DecorateAsync(IAsyncEnumerable<DynPublisherMediaStat> stats);
-    }
+public interface IPublisherMediaStatDecorator
+{
+    IAsyncEnumerable<DynPublisherMediaStat> DecorateAsync(IAsyncEnumerable<DynPublisherMediaStat> stats);
 }

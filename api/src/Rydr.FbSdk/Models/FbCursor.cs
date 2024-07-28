@@ -1,14 +1,13 @@
 using System.Runtime.Serialization;
 
-namespace Rydr.FbSdk.Models
-{
-    [DataContract]
-    public class FbCursor
-    {
-        [DataMember(Name = "after")]
-        public string After { get; set; }
+namespace Rydr.FbSdk.Models;
 
-        [DataMember(Name = "before")]
-        public string Before { get; set; }
-    }
+[DataContract]
+public class FbCursor
+{
+    [DataMember(Name = "after")]
+    public string After { get; set; }
+
+    [DataMember(Name = "before")]
+    public string Before { get; set; }
 }

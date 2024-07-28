@@ -1,11 +1,10 @@
 using System.Runtime.Serialization;
 
-namespace Rydr.FbSdk.Models
+namespace Rydr.FbSdk.Models;
+
+[DataContract]
+public class FbBoolResponse
 {
-    [DataContract]
-    public class FbBoolResponse
-    {
-        [DataMember(Name = "success")]
-        public bool Success { get; set; }
-    }
+    [DataMember(Name = "success")]
+    public bool Success { get; set; }
 }

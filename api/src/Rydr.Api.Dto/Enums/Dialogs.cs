@@ -1,13 +1,12 @@
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Dto.Enums
+namespace Rydr.Api.Dto.Enums;
+
+[EnumAsInt]
+public enum DialogType
 {
-    [EnumAsInt]
-    public enum DialogType
-    {
-        Unknown,
-        OneToOne,
-        Group,
-        Channel
-    }
+    Unknown,
+    OneToOne,
+    Group,
+    Channel
 }

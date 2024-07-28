@@ -1,7 +1,6 @@
-namespace Rydr.Api.Core.Interfaces.DataAccess
+namespace Rydr.Api.Core.Interfaces.DataAccess;
+
+public interface IDbCreateConfiguration
 {
-    public interface IDbCreateConfiguration
-    {
-        void Configure();
-    }
+    void Configure();
 }

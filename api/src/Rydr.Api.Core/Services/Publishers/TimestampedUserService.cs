@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Rydr.Api.Core.Enums;
 using Rydr.Api.Core.Extensions;
 using Rydr.Api.Core.Interfaces.DataAccess;
@@ -17,204 +14,203 @@ using ServiceStack;
 using ServiceStack.Aws.DynamoDb;
 using ServiceStack.Caching;
 
-namespace Rydr.Api.Core.Services.Publishers
+namespace Rydr.Api.Core.Services.Publishers;
+
+public class TimestampedUserService : TimestampCachedServiceBase<DynUser>, IUserService
 {
-    public class TimestampedUserService : TimestampCachedServiceBase<DynUser>, IUserService
+    private readonly IPocoDynamo _dynamoDb;
+    private readonly IClientTokenAuthorizationService _clientTokenAuthorizationService;
+    private readonly IAuthorizeService _authorizeService;
+    private readonly IDeferRequestsService _deferRequestsService;
+    private readonly IRydrDataService _rydrDataService;
+
+    public TimestampedUserService(ICacheClient cacheClient,
+                                  IPocoDynamo dynamoDb,
+                                  IClientTokenAuthorizationService clientTokenAuthorizationService,
+                                  IAuthorizeService authorizeService,
+                                  IDeferRequestsService deferRequestsService,
+                                  IRydrDataService rydrDataService)
+        : base(cacheClient, 1100)
     {
-        private readonly IPocoDynamo _dynamoDb;
-        private readonly IClientTokenAuthorizationService _clientTokenAuthorizationService;
-        private readonly IAuthorizeService _authorizeService;
-        private readonly IDeferRequestsService _deferRequestsService;
-        private readonly IRydrDataService _rydrDataService;
+        _dynamoDb = dynamoDb;
+        _clientTokenAuthorizationService = clientTokenAuthorizationService;
+        _authorizeService = authorizeService;
+        _deferRequestsService = deferRequestsService;
+        _rydrDataService = rydrDataService;
+    }
 
-        public TimestampedUserService(ICacheClient cacheClient,
-                                      IPocoDynamo dynamoDb,
-                                      IClientTokenAuthorizationService clientTokenAuthorizationService,
-                                      IAuthorizeService authorizeService,
-                                      IDeferRequestsService deferRequestsService,
-                                      IRydrDataService rydrDataService)
-            : base(cacheClient, 1100)
+    public DynUser TryGetUser(long userId, bool retryDelayedOnNotFound = false)
+    {
+        if (userId <= 0)
         {
-            _dynamoDb = dynamoDb;
-            _clientTokenAuthorizationService = clientTokenAuthorizationService;
-            _authorizeService = authorizeService;
-            _deferRequestsService = deferRequestsService;
-            _rydrDataService = rydrDataService;
+            return null;
         }
 
-        public DynUser TryGetUser(long userId, bool retryDelayedOnNotFound = false)
+        try
         {
-            if (userId <= 0)
-            {
-                return null;
-            }
+            return GetModel(userId,
+                            () => _dynamoDb.GetItemByRef<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true));
+        }
+        catch(RecordNotFoundException) when(retryDelayedOnNotFound)
+        {
+            return GetModel(userId,
+                            () => _dynamoDb.ExecDelayed(d => d.GetItemByRef<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true)));
+        }
+    }
 
-            try
-            {
-                return GetModel(userId,
-                                () => _dynamoDb.GetItemByRef<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true));
-            }
-            catch(RecordNotFoundException) when(retryDelayedOnNotFound)
-            {
-                return GetModel(userId,
-                                () => _dynamoDb.ExecDelayed(d => d.GetItemByRef<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true)));
-            }
+    public Task<DynUser> TryGetUserAsync(long userId, bool retryDelayedOnNotFound = false)
+    {
+        if (userId <= 0)
+        {
+            return Task.FromResult<DynUser>(null);
         }
 
-        public Task<DynUser> TryGetUserAsync(long userId, bool retryDelayedOnNotFound = false)
+        try
         {
-            if (userId <= 0)
-            {
-                return Task.FromResult<DynUser>(null);
-            }
-
-            try
-            {
-                return GetModelAsync(userId,
-                                     () => _dynamoDb.GetItemByRefAsync<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true));
-            }
-            catch(RecordNotFoundException) when(retryDelayedOnNotFound)
-            {
-                return GetModelAsync(userId,
-                                     () => _dynamoDb.ExecDelayedAsync(d => d.GetItemByRefAsync<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true)));
-            }
+            return GetModelAsync(userId,
+                                 () => _dynamoDb.GetItemByRefAsync<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true));
         }
+        catch(RecordNotFoundException) when(retryDelayedOnNotFound)
+        {
+            return GetModelAsync(userId,
+                                 () => _dynamoDb.ExecDelayedAsync(d => d.GetItemByRefAsync<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User, true, true)));
+        }
+    }
 
-        public DynUser GetUser(long userId)
-            => GetModel(userId,
-                        () => _dynamoDb.GetItemByRef<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User));
+    public DynUser GetUser(long userId)
+        => GetModel(userId,
+                    () => _dynamoDb.GetItemByRef<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User));
 
-        public Task<DynUser> GetUserAsync(long userId)
-            => GetModelAsync(userId,
-                             () => _dynamoDb.GetItemByRefAsync<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User));
+    public Task<DynUser> GetUserAsync(long userId)
+        => GetModelAsync(userId,
+                         () => _dynamoDb.GetItemByRefAsync<DynUser>(userId, userId.ToStringInvariant(), DynItemType.User));
 
-        public IAsyncEnumerable<DynUser> GetUsersAsync(IEnumerable<DynamoItemIdEdge> userIdAndUserNames)
-            => _dynamoDb.GetItemsAsync<DynUser>(userIdAndUserNames.Select(t => new DynamoId(t.Id, t.EdgeId)));
+    public IAsyncEnumerable<DynUser> GetUsersAsync(IEnumerable<DynamoItemIdEdge> userIdAndUserNames)
+        => _dynamoDb.QueryItemsAsync<DynUser>(userIdAndUserNames.Select(t => new DynamoId(t.Id, t.EdgeId)));
 
-        public Task<DynUser> GetUserByAuthUidAsync(string authUid)
-            => GetModelAsync(string.Concat("byauid:", authUid),
-                             async () =>
+    public Task<DynUser> GetUserByAuthUidAsync(string authUid)
+        => GetModelAsync(string.Concat("byauid:", authUid),
+                         async () =>
+                         {
+                             var longId = authUid.ToLongHashCode();
+
+                             var dynUserMap = await MapItemService.DefaultMapItemService
+                                                                  .TryGetMapAsync(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
+
+                             if (dynUserMap == null)
                              {
-                                 var longId = authUid.ToLongHashCode();
+                                 return null;
+                             }
 
-                                 var dynUserMap = await MapItemService.DefaultMapItemService
-                                                                      .TryGetMapAsync(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
+                             return await _dynamoDb.GetItemAsync<DynUser>(dynUserMap.ReferenceNumber.Value, dynUserMap.MappedItemEdgeId);
+                         });
 
-                                 if (dynUserMap == null)
-                                 {
-                                     return null;
-                                 }
+    public DynUser GetUserByAuthUid(string authUid)
+        => GetModel(string.Concat("byauid:", authUid),
+                    () =>
+                    {
+                        var longId = authUid.ToLongHashCode();
 
-                                 return await _dynamoDb.GetItemAsync<DynUser>(dynUserMap.ReferenceNumber.Value, dynUserMap.MappedItemEdgeId);
-                             });
+                        var dynUserMap = MapItemService.DefaultMapItemService
+                                                       .TryGetMap(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
 
-        public DynUser GetUserByAuthUid(string authUid)
-            => GetModel(string.Concat("byauid:", authUid),
-                        () =>
+                        if (dynUserMap == null)
                         {
-                            var longId = authUid.ToLongHashCode();
+                            return null;
+                        }
 
-                            var dynUserMap = MapItemService.DefaultMapItemService
-                                                           .TryGetMap(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
+                        return _dynamoDb.GetItem<DynUser>(dynUserMap.ReferenceNumber.Value, dynUserMap.MappedItemEdgeId);
+                    });
 
-                            if (dynUserMap == null)
-                            {
-                                return null;
-                            }
+    public Task<DynUser> GetUserByUserNameAsync(string userName)
+        => GetModelAsync(string.Concat("byun:", userName.ToLowerInvariant()),
+                         () => _dynamoDb.GetItemByEdgeIntoAsync<DynUser>(DynItemType.User, userName.ToLowerInvariant(), true));
 
-                            return _dynamoDb.GetItem<DynUser>(dynUserMap.ReferenceNumber.Value, dynUserMap.MappedItemEdgeId);
-                        });
+    public DynUser GetUserByUserName(string userName)
+        => GetModel(string.Concat("byun:", userName.ToLowerInvariant()),
+                    () => _dynamoDb.GetItemByEdgeInto<DynUser>(DynItemType.User, userName.ToLowerInvariant(), true));
 
-        public Task<DynUser> GetUserByUserNameAsync(string userName)
-            => GetModelAsync(string.Concat("byun:", userName.ToLowerInvariant()),
-                             () => _dynamoDb.GetItemByEdgeIntoAsync<DynUser>(DynItemType.User, userName.ToLowerInvariant(), true));
+    public async Task LinkAuthUidToUserAsync(string authUid, string authToken, DynUser toUser)
+    {
+        Guard.AgainstNullArgument(toUser == null, nameof(toUser));
+        Guard.AgainstNullArgument(authUid.IsNullOrEmpty(), nameof(authUid));
+        Guard.AgainstNullArgument(authToken.IsNullOrEmpty(), nameof(authToken));
 
-        public DynUser GetUserByUserName(string userName)
-            => GetModel(string.Concat("byun:", userName.ToLowerInvariant()),
-                        () => _dynamoDb.GetItemByEdgeInto<DynUser>(DynItemType.User, userName.ToLowerInvariant(), true));
+        var longId = authUid.ToLongHashCode();
 
-        public async Task LinkAuthUidToUserAsync(string authUid, string authToken, DynUser toUser)
+        var validatedUid = await _clientTokenAuthorizationService.GetUidFromTokenAsync(authToken);
+
+        Guard.AgainstUnauthorized(!authUid.EqualsOrdinal(validatedUid), "Auth information invalid, code[ryuarauid]");
+
+        var dynUserMap = await MapItemService.DefaultMapItemService
+                                             .TryGetMapAsync(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
+
+        if (dynUserMap != null)
         {
-            Guard.AgainstNullArgument(toUser == null, nameof(toUser));
-            Guard.AgainstNullArgument(authUid.IsNullOrEmpty(), nameof(authUid));
-            Guard.AgainstNullArgument(authToken.IsNullOrEmpty(), nameof(authToken));
+            if (dynUserMap.ReferenceNumber.Value != toUser.UserId)
+            {
+                throw new DuplicateRecordException($"User with that authId info already exists. code x=[{dynUserMap.ReferenceNumber.Value}],y=[{toUser.UserId}],z=[{authUid}]");
+            }
 
+            if (!dynUserMap.MappedItemEdgeId.EqualsOrdinalCi(toUser.EdgeId))
+            { //  User email address can change (userId cannot) - if this occurs, update the map
+                dynUserMap.MappedItemEdgeId = toUser.EdgeId;
+
+                await MapItemService.DefaultMapItemService.PutMapAsync(dynUserMap);
+            }
+
+            // Nothin else to do...
+            return;
+        }
+
+        await MapItemService.DefaultMapItemService.PutMapAsync(new DynItemMap
+                                                               {
+                                                                   Id = longId,
+                                                                   EdgeId = DynItemMap.BuildEdgeId(DynItemType.User, authUid),
+                                                                   ReferenceNumber = toUser.UserId,
+                                                                   MappedItemEdgeId = toUser.EdgeId
+                                                               });
+    }
+
+    public async Task DeleteUserAsync(DynUser dynUser, IHasUserAuthorizationInfo withState = null,
+                                      bool hardDelete = false, string authUid = null)
+    {
+        if (hardDelete)
+        {
+            await _dynamoDb.DeleteItemAsync<DynUser>(dynUser.UserId, dynUser.EdgeId);
+        }
+        else
+        {
+            await _dynamoDb.SoftDeleteAsync(dynUser, withState);
+        }
+
+        await Try.ExecAsync(() => _rydrDataService.DeleteByIdAsync<RydrUser>(dynUser.UserId));
+
+        if (authUid.HasValue())
+        {
             var longId = authUid.ToLongHashCode();
 
-            var validatedUid = await _clientTokenAuthorizationService.GetUidFromTokenAsync(authToken);
-
-            Guard.AgainstUnauthorized(!authUid.EqualsOrdinal(validatedUid), "Auth information invalid, code[ryuarauid]");
-
-            var dynUserMap = await MapItemService.DefaultMapItemService
-                                                 .TryGetMapAsync(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
-
-            if (dynUserMap != null)
-            {
-                if (dynUserMap.ReferenceNumber.Value != toUser.UserId)
-                {
-                    throw new DuplicateRecordException($"User with that authId info already exists. code x=[{dynUserMap.ReferenceNumber.Value}],y=[{toUser.UserId}],z=[{authUid}]");
-                }
-
-                if (!dynUserMap.MappedItemEdgeId.EqualsOrdinalCi(toUser.EdgeId))
-                {   //  User email address can change (userId cannot) - if this occurs, update the map
-                    dynUserMap.MappedItemEdgeId = toUser.EdgeId;
-
-                    await MapItemService.DefaultMapItemService.PutMapAsync(dynUserMap);
-                }
-
-                // Nothin else to do...
-                return;
-            }
-
-            await MapItemService.DefaultMapItemService.PutMapAsync(new DynItemMap
-                                                                   {
-                                                                       Id = longId,
-                                                                       EdgeId = DynItemMap.BuildEdgeId(DynItemType.User, authUid),
-                                                                       ReferenceNumber = toUser.UserId,
-                                                                       MappedItemEdgeId = toUser.EdgeId
-                                                                   });
+            await MapItemService.DefaultMapItemService.DeleteMapAsync(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
         }
 
-        public async Task DeleteUserAsync(DynUser dynUser, IHasUserAuthorizationInfo withState = null,
-                                          bool hardDelete = false, string authUid = null)
-        {
-            if (hardDelete)
-            {
-                await _dynamoDb.DeleteItemAsync<DynUser>(dynUser.UserId, dynUser.EdgeId);
-            }
-            else
-            {
-                await _dynamoDb.SoftDeleteAsync(dynUser, withState);
-            }
+        await _authorizeService.DeAuthorizeAllToFromAsync(dynUser.UserId);
 
-            await Try.ExecAsync(() => _rydrDataService.DeleteByIdAsync<RydrUser>(dynUser.UserId));
+        FlushModel(dynUser.UserId);
+    }
 
-            if (authUid.HasValue())
-            {
-                var longId = authUid.ToLongHashCode();
+    public async Task UpdateUserAsync(DynUser dynUser)
+    {
+        await _dynamoDb.PutItemTrackedAsync(dynUser, dynUser);
 
-                await MapItemService.DefaultMapItemService.DeleteMapAsync(longId, DynItemMap.BuildEdgeId(DynItemType.User, authUid));
-            }
+        SetModel(dynUser.UserId, dynUser);
 
-            await _authorizeService.DeAuthorizeAllToFromAsync(dynUser.UserId);
-
-            FlushModel(dynUser.UserId);
-        }
-
-        public async Task UpdateUserAsync(DynUser dynUser)
-        {
-            await _dynamoDb.PutItemTrackedAsync(dynUser, dynUser);
-
-            SetModel(dynUser.UserId, dynUser);
-
-            _deferRequestsService.PublishMessage(new PostDeferredAffected
-                                                 {
-                                                     Ids = new List<long>
-                                                           {
-                                                               dynUser.UserId
-                                                           },
-                                                     Type = RecordType.User
-                                                 });
-        }
+        _deferRequestsService.PublishMessage(new PostDeferredAffected
+                                             {
+                                                 Ids = new List<long>
+                                                       {
+                                                           dynUser.UserId
+                                                       },
+                                                 Type = RecordType.User
+                                             });
     }
 }

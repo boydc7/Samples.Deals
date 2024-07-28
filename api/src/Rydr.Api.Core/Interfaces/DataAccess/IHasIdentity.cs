@@ -1,22 +1,21 @@
 using Rydr.Api.Dto.Interfaces;
 using ServiceStack.Model;
 
-namespace Rydr.Api.Core.Interfaces.DataAccess
+namespace Rydr.Api.Core.Interfaces.DataAccess;
+
+public interface IHasIdentity : IHasId<int>
 {
-    public interface IHasIdentity : IHasId<int>
-    {
-        new int Id { get; set; }
-    }
+    new int Id { get; set; }
+}
 
-    public interface IHasLongIdentity : IHasSettableId { }
+public interface IHasLongIdentity : IHasSettableId { }
 
-    public class Int64Id : IHasSettableId
-    {
-        public long Id { get; set; }
+public class Int64Id : IHasSettableId
+{
+    public long Id { get; set; }
 
-        public static Int64Id FromValue(long value) => new Int64Id
-                                                       {
-                                                           Id = value
-                                                       };
-    }
+    public static Int64Id FromValue(long value) => new()
+                                                   {
+                                                       Id = value
+                                                   };
 }

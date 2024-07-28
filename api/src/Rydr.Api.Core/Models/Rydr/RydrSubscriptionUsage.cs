@@ -1,12 +1,11 @@
-using System;
 using Rydr.Api.Core.Extensions;
 using Rydr.Api.Dto.Enums;
 using ServiceStack.DataAnnotations;
 using ServiceStack.Model;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE SubscriptionUsages;
 CREATE TABLE SubscriptionUsages
 (
@@ -29,62 +28,61 @@ PRIMARY KEY (ManagedPublisherAccountId, WorkspaceId, DealId, DealRequestPublishe
 CREATE UNIQUE INDEX IDX_SubscriptionUsages__Id ON SubscriptionUsages (Id);
 CREATE UNIQUE INDEX IDX_SubscriptionUsages__Wid_Mpid_Id ON SubscriptionUsages (WorkspaceId, ManagedPublisherAccountId, Id);
 ")]
-    [Alias("SubscriptionUsages")]
-    public class RydrSubscriptionUsage : IHasStringId
+[Alias("SubscriptionUsages")]
+public class RydrSubscriptionUsage : IHasStringId
+{
+    [Required]
+    [StringLength(100)]
+    [PrimaryKey]
+    public string Id
     {
-        [Required]
-        [StringLength(100)]
-        [PrimaryKey]
-        public string Id
+        get => string.Concat(MonthOfService.ToSqlDateString(), "_", DealId, "_", DealRequestPublisherAccountId, "_", (int)UsageType);
+
+        // ReSharper disable once ValueParameterNotUsed
+        set
         {
-            get => string.Concat(MonthOfService.ToSqlDateString(), "_", DealId, "_", DealRequestPublisherAccountId, "_", (int)UsageType);
-
-            // ReSharper disable once ValueParameterNotUsed
-            set
-            {
-                // Ignore
-            }
+            // Ignore
         }
-
-        [Required]
-        public long WorkspaceId { get; set; }
-
-        [Required]
-        public long WorkspaceSubscriptionId { get; set; }
-
-        [Required]
-        public long ManagedPublisherAccountId { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string SubscriptionId { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string CustomerId { get; set; }
-
-        [Required]
-        public SubscriptionUsageType UsageType { get; set; }
-
-        [Required]
-        public DateTime UsageOccurredOn { get; set; }
-
-        [Required]
-        public SubscriptionType WorkspaceSubscriptionType { get; set; }
-
-        [Required]
-        public SubscriptionType PublisherSubscriptionType { get; set; }
-
-        [Required]
-        public long DealId { get; set; }
-
-        [Required]
-        public long DealRequestPublisherAccountId { get; set; }
-
-        [Required]
-        public DateTime MonthOfService { get; set; }
-
-        [Required]
-        public int Amount { get; set; }
     }
+
+    [Required]
+    public long WorkspaceId { get; set; }
+
+    [Required]
+    public long WorkspaceSubscriptionId { get; set; }
+
+    [Required]
+    public long ManagedPublisherAccountId { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string SubscriptionId { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string CustomerId { get; set; }
+
+    [Required]
+    public SubscriptionUsageType UsageType { get; set; }
+
+    [Required]
+    public DateTime UsageOccurredOn { get; set; }
+
+    [Required]
+    public SubscriptionType WorkspaceSubscriptionType { get; set; }
+
+    [Required]
+    public SubscriptionType PublisherSubscriptionType { get; set; }
+
+    [Required]
+    public long DealId { get; set; }
+
+    [Required]
+    public long DealRequestPublisherAccountId { get; set; }
+
+    [Required]
+    public DateTime MonthOfService { get; set; }
+
+    [Required]
+    public int Amount { get; set; }
 }

@@ -1,8 +1,8 @@
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE DailyStatSnapshots;
 CREATE TABLE DailyStatSnapshots
 (
@@ -22,6 +22,5 @@ CREATE UNIQUE INDEX IDX_DailyStatSnapshots__Day_RecId_StatEnId_RecType ON DailyS
 CREATE UNIQUE INDEX IDX_DailyStatSnapshots__RecId_Day_StatEnId_RecType ON DailyStatSnapshots (RecordId, DayUtc, StatEnumId, RecordType);
 CREATE UNIQUE INDEX IDX_DailyStatSnapshots__Id ON DailyStatSnapshots (Id);
 ")]
-    [Alias("DailyStatSnapshots")]
-    public class RydrDailyStatSnapshot : RydrDailyStatBase { }
-}
+[Alias("DailyStatSnapshots")]
+public class RydrDailyStatSnapshot : RydrDailyStatBase { }

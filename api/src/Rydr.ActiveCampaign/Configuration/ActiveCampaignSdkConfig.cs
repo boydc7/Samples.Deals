@@ -1,70 +1,68 @@
-using System;
 using System.Text;
 using ServiceStack.Text;
 
 #pragma warning disable 162
 
-namespace Rydr.ActiveCampaign.Configuration
+namespace Rydr.ActiveCampaign.Configuration;
+
+public class ActiveCampaignSdkConfig
 {
-    public class ActiveCampaignSdkConfig
+    private static readonly object _lockObject = new();
+    private static bool _configured;
+    public static bool ClientPoolingDisabled { get; set; }
+
+    private static bool _useLoggedClient;
+
+    public static bool UseLoggedClient
     {
-        private static readonly object _lockObject = new object();
-        private static bool _configured;
-        public static bool ClientPoolingDisabled { get; set; }
-
-        private static bool _useLoggedClient;
-
-        public static bool UseLoggedClient
+        get
         {
-            get
-            {
 #if DEBUG || LOCAL
-                return true;
+            return true;
 #endif
 
-                return _useLoggedClient;
-            }
-            set => _useLoggedClient = value;
+            return _useLoggedClient;
+        }
+        set => _useLoggedClient = value;
+    }
+
+    public static Func<(string accountName, string apiKey, string eventTrackingKey, string eventTrackingAcctId), IActiveCampaignClient> ClientFactory { get; set; } = null;
+
+    public static void Configure()
+    {
+        if (_configured)
+        {
+            return;
         }
 
-        public static Func<(string accountName, string apiKey, string eventTrackingKey, string eventTrackingAcctId), IActiveCampaignClient> ClientFactory { get; set; } = null;
-
-        public static void Configure()
+        try
         {
-            if (_configured)
+            lock(_lockObject)
             {
-                return;
-            }
-
-            try
-            {
-                lock(_lockObject)
+                if (_configured)
                 {
-                    if (_configured)
-                    {
-                        return;
-                    }
-
-                    _configured = true;
+                    return;
                 }
 
-                JsConfig.TextCase = TextCase.CamelCase;
-                JsConfig.DateHandler = DateHandler.ISO8601;
-                JsConfig.AssumeUtc = true;
-
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                _configured = true;
             }
-            catch(Exception) when(ResetConfigured())
-            { // Unreachable code
-                throw;
-            }
-        }
 
-        private static bool ResetConfigured()
-        {
-            _configured = false;
+            JsConfig.TextCase = TextCase.CamelCase;
+            JsConfig.DateHandler = DateHandler.ISO8601;
+            JsConfig.AssumeUtc = true;
 
-            return false;
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
+        catch(Exception) when(ResetConfigured())
+        { // Unreachable code
+            throw;
+        }
+    }
+
+    private static bool ResetConfigured()
+    {
+        _configured = false;
+
+        return false;
     }
 }

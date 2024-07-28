@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>default</LangVersion>
-        <Configurations>Debug;Release;Development</Configurations>
-        <Platforms>AnyCPU</Platforms>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <Configurations>Debug;Release;LocalDevelopment;LocalProduction;Development;LocalDocker</Configurations>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -21,16 +21,9 @@
 
     <ItemGroup>
       <PackageReference Include="GeoCoordinate.NetStandard1" Version="1.0.1" />
-      <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Interfaces.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Text, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Text.dll</HintPath>
-      </Reference>
+      <PackageReference Include="ServiceStack" Version="8.3.0" />
+      <PackageReference Include="ServiceStack.Interfaces" Version="8.3.0" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>

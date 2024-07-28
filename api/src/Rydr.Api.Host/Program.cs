@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Funq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,137 +17,136 @@ using ServiceStack;
 using ServiceStack.Host;
 using ServiceStack.Web;
 
-namespace Rydr.Api.Host
+namespace Rydr.Api.Host;
+
+public static class Program
 {
-    public static class Program
+    public static void Main()
     {
-        public static void Main()
-        {
-            var hostBuilder = new HostBuilder().UseContentRoot(Directory.GetCurrentDirectory())
-                                               .ConfigureHostConfiguration(BuildConfiguration)
-                                               .ConfigureAppConfiguration((wc, conf) => BuildConfiguration(conf))
-                                               .UseEnvironment(RydrBuildEnvironment.EnvName)
-                                               .ConfigureLogging(b => b.ClearProviders()
-                                                                       .AddNLog()
-                                                                       .SetMinimumLevel(LogLevel.Debug))
-                                               .ConfigureWebHost(whb => whb.UseShutdownTimeout(TimeSpan.FromSeconds(RydrBuildEnvironment.ShutdownTimeSeconds))
-                                                                           .UseUrls(RydrBuildEnvironment.ListenOn)
-                                                                           .UseKestrel(o => { o.AllowSynchronousIO = true; })
-                                                                           .UseStartup<RydrStartup>());
+        var hostBuilder = new HostBuilder().UseContentRoot(Directory.GetCurrentDirectory())
+                                           .ConfigureHostConfiguration(BuildConfiguration)
+                                           .ConfigureAppConfiguration((wc, conf) => BuildConfiguration(conf))
+                                           .UseEnvironment(RydrBuildEnvironment.EnvName)
+                                           .ConfigureLogging(b => b.ClearProviders()
+                                                                   .AddNLog()
+                                                                   .SetMinimumLevel(LogLevel.Debug))
+                                           .ConfigureWebHost(whb => whb.UseShutdownTimeout(TimeSpan.FromSeconds(RydrBuildEnvironment.ShutdownTimeSeconds))
+                                                                       .UseUrls(RydrBuildEnvironment.ListenOn)
+                                                                       .UseKestrel(o => { o.AllowSynchronousIO = true; })
+                                                                       .UseStartup<RydrStartup>());
 
-            var host = hostBuilder.Build();
+        var host = hostBuilder.Build();
 
-            host.Run();
-        }
-
-        // The configuration produced by this method is used for both the host and app configurations.
-        private static void BuildConfiguration(IConfigurationBuilder conf)
-            => conf.AddJsonFile("appsettings.json", false, true)
-                   .AddJsonFile($"appsettings.{RydrBuildEnvironment.Configuration}.json", true, true);
+        host.Run();
     }
 
-    public class RydrStartup
+    // The configuration produced by this method is used for both the host and app configurations.
+    private static void BuildConfiguration(IConfigurationBuilder conf)
+        => conf.AddJsonFile("appsettings.json", false, true)
+               .AddJsonFile($"appsettings.{RydrBuildEnvironment.Configuration}.json", true, true);
+}
+
+public class RydrStartup
+{
+    private ApiAppHost _appHost;
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services) { }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app)
     {
-        private ApiAppHost _appHost;
+        var configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
+        var appLifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services) { }
+        RydrEnvironment.SetAppSettings(new NetCoreAppSettings(configuration));
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
-        {
-            var configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
-            var appLifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+        RydrAppHostHelper.Instance.Create();
 
-            RydrEnvironment.SetAppSettings(new NetCoreAppSettings(configuration));
+        _appHost = new ApiAppHost
+                   {
+                       AppSettings = RydrEnvironment.AppSettings
+                   };
 
-            RydrAppHostHelper.Instance.Create();
+        app.UseServiceStack(_appHost);
 
-            _appHost = new ApiAppHost
-                       {
-                           AppSettings = RydrEnvironment.AppSettings
-                       };
+        appLifetime.ApplicationStopping.Register(OnShutdown);
 
-            app.UseServiceStack(_appHost);
+        RydrAppHostHelper.Instance.OnBeforeRun(_appHost);
 
-            appLifetime.ApplicationStopping.Register(OnShutdown);
+        app.Run(context =>
+                {
+                    context.Response.Redirect("/metadata");
 
-            RydrAppHostHelper.Instance.OnBeforeRun(_appHost);
+                    return Task.FromResult(0);
+                });
 
-            app.Run(context =>
-                    {
-                        context.Response.Redirect("/metadata");
-
-                        return Task.FromResult(0);
-                    });
-
-            RydrAppHostHelper.Instance.Log.InfoFormat("Listening for requests, HostUrl is [{0}]", RydrUrls.WebHostUri.AbsoluteUri);
-        }
-
-        public void OnShutdown() => _appHost.Shutdown();
+        RydrAppHostHelper.Instance.Log.InfoFormat("Listening for requests, HostUrl is [{0}]", RydrUrls.WebHostUri.AbsoluteUri);
     }
 
-    public class ApiAppHost : AppHostBase
+    public void OnShutdown() => _appHost.Shutdown();
+}
+
+public class ApiAppHost : AppHostBase
+{
+    private RequestExecutorFactory _requestExecutorFactory;
+    private IStats _stats;
+
+    public ApiAppHost() : base("Rydr Self Hosted API", typeof(ApiAppHost).Assembly) { }
+
+    public override void Configure(Container container)
     {
-        private RequestExecutorFactory _requestExecutorFactory;
-        private IStats _stats;
+        RydrAppHostHelper.Instance.Init();
+        RydrEnvironment.SetContainer(container);
 
-        public ApiAppHost() : base("Rydr Self Hosted API", typeof(ApiAppHost).Assembly) { }
+        container.Register(c => new RequestExecutorFactory(c.Resolve<IStats>(),
+                                                           c.Resolve<ICounterAndListService>(),
+                                                           c.Resolve<IServiceCacheInvalidator>(),
+                                                           c.Resolve<IDecorateResponsesService>()))
+                 .ReusedWithin(ReuseScope.Hierarchy);
 
-        public override void Configure(Container container)
-        {
-            RydrAppHostHelper.Instance.Init();
-            RydrEnvironment.SetContainer(container);
-
-            container.Register(c => new RequestExecutorFactory(c.Resolve<IStats>(),
-                                                               c.Resolve<ICounterAndListService>(),
-                                                               c.Resolve<IServiceCacheInvalidator>(),
-                                                               c.Resolve<IDecorateResponsesService>()))
-                     .ReusedWithin(ReuseScope.Hierarchy);
-
-            RydrAppHostHelper.Instance.Configure(this, container);
-        }
-
-        public override IServiceRunner<TRequest> CreateServiceRunner<TRequest>(ActionContext actionContext)
-            => new RydrServiceRunner<TRequest>(this, actionContext,
-                                               (_requestExecutorFactory ??= Container.Resolve<RequestExecutorFactory>()).CreateRequestExecutor<TRequest>(),
-                                               (_stats ??= Container.Resolve<IStats>()));
-
-        public void Shutdown() => RydrAppHostHelper.Instance.Shutdown(Container);
-
-        // No cookie for you
-        public override bool SetCookieFilter(IRequest req, Cookie cookie) => false;
+        RydrAppHostHelper.Instance.Configure(this, container);
     }
 
-    public class RydrServiceRunner<TRequest> : ServiceRunner<TRequest>
+    public override IServiceRunner<TRequest> CreateServiceRunner<TRequest>(ActionContext actionContext)
+        => new RydrServiceRunner<TRequest>(this, actionContext,
+                                           (_requestExecutorFactory ??= Container.Resolve<RequestExecutorFactory>()).CreateRequestExecutor<TRequest>(),
+                                           (_stats ??= Container.Resolve<IStats>()));
+
+    public void Shutdown() => RydrAppHostHelper.Instance.Shutdown(Container);
+
+    // No cookie for you
+    public override bool SetCookieFilter(IRequest req, Cookie cookie) => false;
+}
+
+public class RydrServiceRunner<TRequest> : ServiceRunner<TRequest>
+{
+    private readonly IRequestExecutor<TRequest> _requestExecutor;
+    private readonly IStats _stats;
+
+    public RydrServiceRunner(IAppHost appHost, ActionContext actionContext,
+                             IRequestExecutor<TRequest> requestExecutor, IStats stats)
+        : base(appHost, actionContext)
     {
-        private readonly IRequestExecutor<TRequest> _requestExecutor;
-        private readonly IStats _stats;
+        _requestExecutor = requestExecutor;
+        _stats = stats;
+    }
 
-        public RydrServiceRunner(IAppHost appHost, ActionContext actionContext,
-                                 IRequestExecutor<TRequest> requestExecutor, IStats stats)
-            : base(appHost, actionContext)
-        {
-            _requestExecutor = requestExecutor;
-            _stats = stats;
-        }
+    public override async Task<object> ExecuteAsync(IRequest req, object instance, TRequest requestDto)
+    {
+        var dtoName = requestDto.GetType().Name;
 
-        public override async Task<object> ExecuteAsync(IRequest req, object instance, TRequest requestDto)
-        {
-            var dtoName = requestDto.GetType().Name;
+        var result = await _stats.MeasureAsync(new[]
+                                               {
+                                                   Stats.StatsKey(dtoName.StartsWith("Query", StringComparison.OrdinalIgnoreCase)
+                                                                      ? "QUERY"
+                                                                      : req.Verb,
+                                                                  StatsKeySuffix.ResponseTime),
+                                                   Stats.AllApiResponseTime
+                                               },
+                                               () => _requestExecutor.ExecuteAsync(req, instance, requestDto, base.ExecuteAsync),
+                                               string.Concat("dto:", dtoName));
 
-            var result = await _stats.MeasureAsync(new[]
-                                                   {
-                                                       Stats.StatsKey(dtoName.StartsWith("Query", StringComparison.OrdinalIgnoreCase)
-                                                                          ? "QUERY"
-                                                                          : req.Verb,
-                                                                      StatsKeySuffix.ResponseTime),
-                                                       Stats.AllApiResponseTime
-                                                   },
-                                                   () => _requestExecutor.ExecuteAsync(req, instance, requestDto, base.ExecuteAsync),
-                                                   string.Concat("dto:", dtoName));
-
-            return result;
-        }
+        return result;
     }
 }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Rydr.Api.Core.Configuration;
 using Rydr.Api.Core.Enums;
 using Rydr.Api.Core.Extensions;
@@ -16,60 +12,59 @@ using Rydr.Api.Dto.Publishers;
 using ServiceStack;
 using ServiceStack.Aws.DynamoDb;
 
-namespace Rydr.Api.Core.Services.Publishers
+namespace Rydr.Api.Core.Services.Publishers;
+
+public class InstagramPublisherDataService : BasePublisherDataService
 {
-    public class InstagramPublisherDataService : BasePublisherDataService
+    private readonly string _defaultInstagramAppId;
+    private DynPublisherApp _defaultInstagramApp;
+
+    public InstagramPublisherDataService(IPocoDynamo dynamoDb,
+                                         IAuthorizationService authorizationService,
+                                         IEncryptionService encryptionService,
+                                         IRequestStateManager requestStateManager,
+                                         IPublisherAccountService publisherAccountService)
+        : base(dynamoDb, authorizationService, encryptionService, requestStateManager, publisherAccountService)
     {
-        private readonly string _defaultInstagramAppId;
-        private DynPublisherApp _defaultInstagramApp;
+        // ReSharper disable once NotResolvedInText
+        _defaultInstagramAppId = RydrEnvironment.GetAppSetting("Instagram.DefaultAppId") ?? throw new ArgumentNullException("Instagram.DefaultAppId");
+    }
 
-        public InstagramPublisherDataService(IPocoDynamo dynamoDb,
-                                             IAuthorizationService authorizationService,
-                                             IEncryptionService encryptionService,
-                                             IRequestStateManager requestStateManager,
-                                             IPublisherAccountService publisherAccountService)
-            : base(dynamoDb, authorizationService, encryptionService, requestStateManager, publisherAccountService)
+    public override PublisherType PublisherType => PublisherType.Instagram;
+
+    public override async Task<DynPublisherApp> GetDefaultPublisherAppAsync()
+        => _defaultInstagramApp ??= await _dynamoDb.GetItemByEdgeIntoAsync<DynPublisherApp>(DynItemType.PublisherApp, DynPublisherApp.BuildEdgeId(PublisherType.Instagram, _defaultInstagramAppId));
+
+    protected override async Task<List<PublisherMedia>> DoGetRecentMediaAsync(DynPublisherAccount forAccount, DynPublisherAppAccount withAppAccount, int limit = 50)
+    {
+        if (withAppAccount == null || withAppAccount.IsDeleted())
         {
-            // ReSharper disable once NotResolvedInText
-            _defaultInstagramAppId = RydrEnvironment.GetAppSetting("Instagram.DefaultAppId") ?? throw new ArgumentNullException("Instagram.DefaultAppId");
+            return new List<PublisherMedia>();
         }
 
-        public override PublisherType PublisherType => PublisherType.Instagram;
+        var client = await withAppAccount.GetOrCreateIgBasicClientAsync();
 
-        public override async Task<DynPublisherApp> GetDefaultPublisherAppAsync()
-            => _defaultInstagramApp ??= await _dynamoDb.GetItemByEdgeIntoAsync<DynPublisherApp>(DynItemType.PublisherApp, DynPublisherApp.BuildEdgeId(PublisherType.Instagram, _defaultInstagramAppId));
+        var recentMedias = await client.GetBasicIgAccountMediaAsync()
+                                       .SelectManyToListAsync(b => b.Select(igm => igm.ToPublisherMedia(forAccount.PublisherAccountId)),
+                                                              limit);
 
-        protected override async Task<List<PublisherMedia>> DoGetRecentMediaAsync(DynPublisherAccount forAccount, DynPublisherAppAccount withAppAccount, int limit = 50)
-        {
-            if (withAppAccount == null || withAppAccount.IsDeleted())
-            {
-                return new List<PublisherMedia>();
-            }
+        return recentMedias;
+    }
 
-            var client = await withAppAccount.GetOrCreateIgBasicClientAsync();
+    protected override async Task<bool> ValidateAndDecorateAppAccountAsync(DynPublisherAppAccount appAccount, string rawAccessToken = null)
+    {
+        var client = await appAccount.GetOrCreateIgBasicClientAsync(rawAccessToken);
 
-            var recentMedias = await client.GetBasicIgAccountMediaAsync()
-                                           .SelectManyToListAsync(b => b.Select(igm => igm.ToPublisherMedia(forAccount.PublisherAccountId)),
-                                                                  limit);
+        var igProfile = await client.GetMyAccountAsync(false);
 
-            return recentMedias;
-        }
+        Guard.AgainstInvalidData((igProfile?.Id).IsNullOrEmpty() ||
+                                 (igProfile?.UserName).IsNullOrEmpty(),
+                                 $"BasicIg client token invalid - code [{appAccount.PublisherAccountId}|{appAccount.PublisherAppId}]");
 
-        protected override async Task<bool> ValidateAndDecorateAppAccountAsync(DynPublisherAppAccount appAccount, string rawAccessToken = null)
-        {
-            var client = await appAccount.GetOrCreateIgBasicClientAsync(rawAccessToken);
+        appAccount.ForUserId = igProfile.Id;
 
-            var igProfile = await client.GetMyAccountAsync(false);
+        await PublisherMediaSyncService.SyncUserDataAsync(new SyncPublisherAppAccountInfo(appAccount));
 
-            Guard.AgainstInvalidData((igProfile?.Id).IsNullOrEmpty() ||
-                                     (igProfile?.UserName).IsNullOrEmpty(),
-                                     $"BasicIg client token invalid - code [{appAccount.PublisherAccountId}|{appAccount.PublisherAppId}]");
-
-            appAccount.ForUserId = igProfile.Id;
-
-            await PublisherMediaSyncService.SyncUserDataAsync(new SyncPublisherAppAccountInfo(appAccount));
-
-            return true;
-        }
+        return true;
     }
 }

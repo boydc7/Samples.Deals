@@ -1,11 +1,10 @@
-namespace Rydr.Api.Core.Enums
+namespace Rydr.Api.Core.Enums;
+
+public enum AuthorizerFailLevel
 {
-    public enum AuthorizerFailLevel
-    {
-        Unspecified,
-        ExplicitlyAuthorized,
-        FailUnlessExplicitlyAuthorized,
-        Unauthorized,
-        ExplicitRead
-    }
+    Unspecified,
+    ExplicitlyAuthorized,
+    FailUnlessExplicitlyAuthorized,
+    Unauthorized,
+    ExplicitRead
 }

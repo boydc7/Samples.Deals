@@ -1,9 +1,8 @@
 using Rydr.Api.Dto.Enums;
 
-namespace Rydr.Api.Dto.Interfaces
+namespace Rydr.Api.Dto.Interfaces;
+
+public interface IDecorateAsRecordType
 {
-    public interface IDecorateAsRecordType
-    {
-        RecordType DecorateRecordType { get; }
-    }
+    RecordType DecorateRecordType { get; }
 }

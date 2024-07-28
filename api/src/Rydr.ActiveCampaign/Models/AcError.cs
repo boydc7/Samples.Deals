@@ -1,16 +1,13 @@
-using System.Collections.Generic;
+namespace Rydr.ActiveCampaign.Models;
 
-namespace Rydr.ActiveCampaign.Models
+public class AcErrors
 {
-    public class AcErrors
-    {
-        public IReadOnlyList<AcError> Errors { get; set; }
-    }
+    public IReadOnlyList<AcError> Errors { get; set; }
+}
 
-    public class AcError
-    {
-        public string Title { get; set; }
+public class AcError
+{
+    public string Title { get; set; }
 
-        public override string ToString() => Title;
-    }
+    public override string ToString() => Title;
 }

@@ -1,0 +1,5 @@
+GRANT ALL PRIVILEGES ON *.* TO 'rydrsql'@'%';
+
+CREATE DATABASE IF NOT EXISTS `rydr`;
+
+GRANT ALL PRIVILEGES ON *.* TO 'rydrsql'@'%';

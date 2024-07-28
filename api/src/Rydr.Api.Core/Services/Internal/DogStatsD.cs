@@ -1,185 +1,181 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Rydr.Api.Core.Configuration;
 using Rydr.Api.Core.Interfaces.Internal;
 using StatsdClient;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
-namespace Rydr.Api.Core.Services.Internal
+namespace Rydr.Api.Core.Services.Internal;
+
+public class DogStatsD : IStats
 {
-    public class DogStatsD : IStats
+    private readonly bool _isConfigured;
+
+    public DogStatsD()
     {
-        private readonly bool _isConfigured;
+        var config = RydrEnvironment.GetAppSetting("Stats.StatsD.Server");
 
-        public DogStatsD()
+        string server = null;
+        var port = 0;
+
+        if (config != null && config.IndexOf(":", StringComparison.Ordinal) > 0)
         {
-            var config = RydrEnvironment.GetAppSetting("Stats.StatsD.Server");
-
-            string server = null;
-            var port = 0;
-
-            if (config != null && config.IndexOf(":", StringComparison.Ordinal) > 0)
-            {
-                server = config.Split(':')[0];
-                port = Convert.ToInt32(config.Split(':')[1]);
-            }
-            else if (!string.IsNullOrEmpty(config))
-            {
-                server = config;
-                port = 8125;
-            }
-
-            if (string.IsNullOrEmpty(server))
-            {
-                return;
-            }
-
-            DogStatsd.Configure(new StatsdConfig
-                                {
-                                    StatsdServerName = server,
-                                    StatsdPort = port,
-                                    ConstantTags = new[]
-                                                   {
-                                                       string.Concat("env:", RydrEnvironment.CurrentEnvironment)
-                                                   }
-                                });
-
-            _isConfigured = true;
+            server = config.Split(':')[0];
+            port = Convert.ToInt32(config.Split(':')[1]);
+        }
+        else if (!string.IsNullOrEmpty(config))
+        {
+            server = config;
+            port = 8125;
         }
 
-        public static DogStatsD Default { get; } = new DogStatsD();
-
-        public void Dispose()
+        if (string.IsNullOrEmpty(server))
         {
-            throw new NotImplementedException();
+            return;
         }
 
-        public bool Timing(string key, long value, params string[] tags)
-        {
-            if (_isConfigured)
-            {
-                DogStatsd.Timer(key, value, tags: tags);
-            }
+        DogStatsd.Configure(new StatsdConfig
+                            {
+                                StatsdServerName = server,
+                                StatsdPort = port,
+                                ConstantTags = new[]
+                                               {
+                                                   string.Concat("env:", RydrEnvironment.CurrentEnvironment)
+                                               }
+                            });
 
-            return _isConfigured;
+        _isConfigured = true;
+    }
+
+    public static DogStatsD Default { get; } = new();
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Timing(string key, long value, params string[] tags)
+    {
+        if (_isConfigured)
+        {
+            DogStatsd.Timer(key, value, tags: tags);
         }
 
-        public bool Increment(string key, int magnitude = 1)
-        {
-            if (_isConfigured)
-            {
-                DogStatsd.Increment(key, magnitude);
-            }
+        return _isConfigured;
+    }
 
-            return _isConfigured;
+    public bool Increment(string key, int magnitude = 1)
+    {
+        if (_isConfigured)
+        {
+            DogStatsd.Increment(key, magnitude);
         }
 
-        public bool Gauge(string key, long value)
-        {
-            if (_isConfigured)
-            {
-                DogStatsd.Gauge(key, value);
-            }
+        return _isConfigured;
+    }
 
-            return _isConfigured;
+    public bool Gauge(string key, long value)
+    {
+        if (_isConfigured)
+        {
+            DogStatsd.Gauge(key, value);
         }
 
-        public async Task<T> MeasureAsync<T>(string key, Func<Task<T>> action)
+        return _isConfigured;
+    }
+
+    public async Task<T> MeasureAsync<T>(string key, Func<Task<T>> action)
+    {
+        if (!_isConfigured)
         {
-            if (!_isConfigured)
+            return await action();
+        }
+
+        var sw = Stopwatch.StartNew();
+
+        T result;
+
+        try
+        {
+            result = await action();
+        }
+        finally
+        {
+            sw.Stop();
+            Timing(key, sw.ElapsedMilliseconds);
+        }
+
+        return result;
+    }
+
+    public async Task<T> MeasureAsync<T>(IEnumerable<string> keys, Func<Task<T>> asyncAction, params string[] tags)
+    {
+        if (!_isConfigured)
+        {
+            return await asyncAction();
+        }
+
+        T result;
+
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            result = await asyncAction();
+        }
+        finally
+        {
+            sw.Stop();
+
+            foreach (var key in keys)
             {
-                return await action();
+                Timing(key, sw.ElapsedMilliseconds, tags);
             }
+        }
 
-            var sw = Stopwatch.StartNew();
+        return result;
+    }
 
-            T result;
+    public T Measure<T>(string key, Func<T> action)
+        => _isConfigured
+               ? DogStatsd.Time(action, key)
+               : action();
 
-            try
+    public T Measure<T>(IEnumerable<string> keys, Func<T> action)
+    {
+        if (!_isConfigured)
+        {
+            return action();
+        }
+
+        T result;
+
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            result = action();
+        }
+        finally
+        {
+            sw.Stop();
+
+            foreach (var key in keys)
             {
-                result = await action();
-            }
-            finally
-            {
-                sw.Stop();
                 Timing(key, sw.ElapsedMilliseconds);
             }
-
-            return result;
         }
 
-        public async Task<T> MeasureAsync<T>(IEnumerable<string> keys, Func<Task<T>> asyncAction, params string[] tags)
+        return result;
+    }
+
+    public void Measure(string key, Action action)
+    {
+        if (_isConfigured)
         {
-            if (!_isConfigured)
-            {
-                return await asyncAction();
-            }
-
-            T result;
-
-            var sw = Stopwatch.StartNew();
-
-            try
-            {
-                result = await asyncAction();
-            }
-            finally
-            {
-                sw.Stop();
-
-                foreach (var key in keys)
-                {
-                    Timing(key, sw.ElapsedMilliseconds, tags);
-                }
-            }
-
-            return result;
+            DogStatsd.Time(action, key);
         }
-
-        public T Measure<T>(string key, Func<T> action)
-            => _isConfigured
-                   ? DogStatsd.Time(action, key)
-                   : action();
-
-        public T Measure<T>(IEnumerable<string> keys, Func<T> action)
+        else
         {
-            if (!_isConfigured)
-            {
-                return action();
-            }
-
-            T result;
-
-            var sw = Stopwatch.StartNew();
-
-            try
-            {
-                result = action();
-            }
-            finally
-            {
-                sw.Stop();
-
-                foreach (var key in keys)
-                {
-                    Timing(key, sw.ElapsedMilliseconds);
-                }
-            }
-
-            return result;
-        }
-
-        public void Measure(string key, Action action)
-        {
-            if (_isConfigured)
-            {
-                DogStatsd.Time(action, key);
-            }
-            else
-            {
-                action();
-            }
+            action();
         }
     }
 }

@@ -1,11 +1,10 @@
-using System;
 using Rydr.Api.Dto.Enums;
 using ServiceStack.DataAnnotations;
 using ServiceStack.Model;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE DealRequests;
 CREATE TABLE DealRequests
 (
@@ -28,52 +27,51 @@ CREATE UNIQUE INDEX UIDX_DealRequests__PubAcctId_DealId ON DealRequests (Publish
 CREATE UNIQUE INDEX UIDX_DealRequests__Id ON DealRequests (Id);
 CREATE UNIQUE INDEX UIDX_DealRequests__StatusUpdated_DealId_PubAcctId ON DealRequests (StatusUpdatedOn, DealId, PublisherAccountId);
 ")]
-    [Alias("DealRequests")]
-    public class RydrDealRequest : IHasStringId
+[Alias("DealRequests")]
+public class RydrDealRequest : IHasStringId
+{
+    [Required]
+    [PrimaryKey]
+    public string Id
     {
-        [Required]
-        [PrimaryKey]
-        public string Id
+        get => string.Concat(DealId, "|", PublisherAccountId);
+
+        // ReSharper disable once ValueParameterNotUsed
+        set
         {
-            get => string.Concat(DealId, "|", PublisherAccountId);
-
-            // ReSharper disable once ValueParameterNotUsed
-            set
-            {
-                // Ignore
-            }
+            // Ignore
         }
-
-        [Required]
-        [CheckConstraint("DealId > 0")]
-        public long DealId { get; set; }
-
-        [Required]
-        [CheckConstraint("PublisherAccountId > 0")]
-        public long PublisherAccountId { get; set; }
-
-        [Required]
-        public DealRequestStatus Status { get; set; }
-
-        [Required]
-        public DateTime StatusUpdatedOn { get; set; }
-
-        public DateTime? CompletedOn { get; set; }
-
-        [Required]
-        public long DealContextWorkspaceId { get; set; }
-
-        [Required]
-        public int HoursAllowedInProgress { get; set; } // Time allowed while in-progress
-
-        [Required]
-        public int HoursAllowedRedeemed { get; set; } // Time allowed while redeemed
-
-        public DateTime? RescindOn { get; set; }
-        public DateTime? DelinquentOn { get; set; }
-        public DateTime? UsageChargedOn { get; set; }
-
-        [Required]
-        public DateTime RequestedOn { get; set; }
     }
+
+    [Required]
+    [CheckConstraint("DealId > 0")]
+    public long DealId { get; set; }
+
+    [Required]
+    [CheckConstraint("PublisherAccountId > 0")]
+    public long PublisherAccountId { get; set; }
+
+    [Required]
+    public DealRequestStatus Status { get; set; }
+
+    [Required]
+    public DateTime StatusUpdatedOn { get; set; }
+
+    public DateTime? CompletedOn { get; set; }
+
+    [Required]
+    public long DealContextWorkspaceId { get; set; }
+
+    [Required]
+    public int HoursAllowedInProgress { get; set; } // Time allowed while in-progress
+
+    [Required]
+    public int HoursAllowedRedeemed { get; set; } // Time allowed while redeemed
+
+    public DateTime? RescindOn { get; set; }
+    public DateTime? DelinquentOn { get; set; }
+    public DateTime? UsageChargedOn { get; set; }
+
+    [Required]
+    public DateTime RequestedOn { get; set; }
 }

@@ -9,45 +9,44 @@ using Rydr.Api.Core.Services.Internal;
 using ServiceStack.Aws.DynamoDb;
 using ServiceStack.Redis;
 
-namespace Rydr.Api.Core.Configuration
+namespace Rydr.Api.Core.Configuration;
+
+public class LiveProvidersConfiguration : SharedProvidersConfiguration
 {
-    public class LiveProvidersConfiguration : SharedProvidersConfiguration
+    protected override BaseDataAccessConfiguration RydrConfiguration => new MySqlConfiguration(ConnectionStringAppNames.Rydr);
+    protected override BaseDataAccessConfiguration DwConfiguration => new RedshiftConfiguration(ConnectionStringAppNames.Dw);
+
+    public override bool DropExistingTablesOnDbConfig => (ForceDbRecreate || _forceSchemaDelete) && !_rydrSchemaCreateDisabled && !_allSchemaCreateDisabled;
+
+    protected override void RegisterCaching(Container container)
     {
-        protected override BaseDataAccessConfiguration RydrConfiguration => new MySqlConfiguration(ConnectionStringAppNames.Rydr);
-        protected override BaseDataAccessConfiguration DwConfiguration => new RedshiftConfiguration(ConnectionStringAppNames.Dw);
+        container.Register<ICounterAndListService>(InMemoryCounterAndListService.Instance);
 
-        public override bool DropExistingTablesOnDbConfig => (ForceDbRecreate || _forceSchemaDelete) && !_rydrSchemaCreateDisabled && !_allSchemaCreateDisabled;
+        // Always register the Redis instance for caching, we use it for other things aside from just the ICacheClient implementation
+        SharedConfiguration.RegisterNamedRedisProvider(ConnectionStringAppNames.Caching, container);
 
-        protected override void RegisterCaching(Container container)
-        {
-            container.Register<ICounterAndListService>(InMemoryCounterAndListService.Instance);
+        container.Register(c => c.ResolveNamed<IRedisClientsManager>(ConnectionStringAppNames.Caching).GetCacheClient())
+                 .ReusedWithin(ReuseScope.Hierarchy);
 
-            // Always register the Redis instance for caching, we use it for other things aside from just the ICacheClient implementation
-            SharedConfiguration.RegisterNamedRedisProvider(ConnectionStringAppNames.Caching, container);
+        container.Register<IDistributedLockService>(c => new CacheDistributedLockService(c.ResolveNamed<IRedisClientsManager>(ConnectionStringAppNames.Caching).GetCacheClient()))
+                 .ReusedWithin(ReuseScope.Hierarchy);
 
-            container.Register(c => c.ResolveNamed<IRedisClientsManager>(ConnectionStringAppNames.Caching).GetCacheClient())
-                     .ReusedWithin(ReuseScope.Hierarchy);
+        container.Register<IPersistentCounterAndListService>(c => new RedisCounterAndListService(c.ResolveNamed<IRedisClientsManager>(ConnectionStringAppNames.Caching)))
+                 .ReusedWithin(ReuseScope.Hierarchy);
+    }
 
-            container.Register<IDistributedLockService>(c => new CacheDistributedLockService(c.ResolveNamed<IRedisClientsManager>(ConnectionStringAppNames.Caching).GetCacheClient()))
-                     .ReusedWithin(ReuseScope.Hierarchy);
+    protected override void RegisterFileStorageProviders(Container container)
+    {
+        // Default
+        container.Register(c => c.ResolveNamed<IFileStorageProvider>(FileStorageProviderType.S3.ToString()))
+                 .ReusedWithin(ReuseScope.Hierarchy);
+    }
 
-            container.Register<IPersistentCounterAndListService>(c => new RedisCounterAndListService(c.ResolveNamed<IRedisClientsManager>(ConnectionStringAppNames.Caching)))
-                     .ReusedWithin(ReuseScope.Hierarchy);
-        }
-
-        protected override void RegisterFileStorageProviders(Container container)
-        {
-            // Default
-            container.Register(c => c.ResolveNamed<IFileStorageProvider>(FileStorageProviderType.S3.ToString()))
-                     .ReusedWithin(ReuseScope.Hierarchy);
-        }
-
-        protected override void RegisterStaticServices(Container container)
-        {
-            container.Register<IFileStorageService>(c => new S3FileStorageService(c.Resolve<IFileStorageProvider>(),
-                                                                                  c.Resolve<IPocoDynamo>(),
-                                                                                  c.Resolve<IAuthorizationService>(),
-                                                                                  c.Resolve<IDeferRequestsService>()));
-        }
+    protected override void RegisterStaticServices(Container container)
+    {
+        container.Register<IFileStorageService>(c => new S3FileStorageService(c.Resolve<IFileStorageProvider>(),
+                                                                              c.Resolve<IPocoDynamo>(),
+                                                                              c.Resolve<IAuthorizationService>(),
+                                                                              c.Resolve<IDeferRequestsService>()));
     }
 }

@@ -1,12 +1,11 @@
-using System;
 using Rydr.Api.Core.Extensions;
 using Rydr.Api.Dto.Enums;
 using ServiceStack.DataAnnotations;
 using ServiceStack.Model;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE DailyStats;
 CREATE TABLE DailyStats
 (
@@ -26,56 +25,55 @@ CREATE UNIQUE INDEX IDX_DailyStats__Day_RecId_StatEnId_RecType ON DailyStats (Da
 CREATE UNIQUE INDEX IDX_DailyStats__RecId_Day_StatEnId_RecType ON DailyStats (RecordId, DayUtc, StatEnumId, RecordType);
 CREATE UNIQUE INDEX IDX_DailyStats__Id ON DailyStats (Id);
 ")]
-    [Alias("DailyStats")]
-    public class RydrDailyStat : RydrDailyStatBase { }
+[Alias("DailyStats")]
+public class RydrDailyStat : RydrDailyStatBase { }
 
-    public abstract class RydrDailyStatBase : IHasStringId
+public abstract class RydrDailyStatBase : IHasStringId
+{
+    [Required]
+    [PrimaryKey]
+    public string Id
     {
-        [Required]
-        [PrimaryKey]
-        public string Id
+        get => string.Concat(StatEnumId, "_", (int)RecordType, "_", RecordId, "_", DayUtc.ToUnixTimestamp());
+
+        // ReSharper disable once ValueParameterNotUsed
+        set
         {
-            get => string.Concat(StatEnumId, "_", (int)RecordType, "_", RecordId, "_", DayUtc.ToUnixTimestamp());
-
-            // ReSharper disable once ValueParameterNotUsed
-            set
-            {
-                // Ignore
-            }
+            // Ignore
         }
-
-        [Required]
-        public long StatEnumId { get; set; }
-
-        [Required]
-        [CheckConstraint("RecordId > 0")]
-        public long RecordId { get; set; }
-
-        [Required]
-        [CheckConstraint("RecordType > 0")]
-        public RecordType RecordType { get; set; }
-
-        [Required]
-        public DateTime DayUtc { get; set; }
-
-        [Required]
-        [CheckConstraint("PublisherAccountId > 0")]
-        public long PublisherAccountId { get; set; }
-
-        [Required]
-        [DecimalLength(18, 4)]
-        public double Val { get; set; }
-
-        [Required]
-        [DecimalLength(18, 4)]
-        public double MinVal { get; set; }
-
-        [Required]
-        [DecimalLength(18, 4)]
-        public double MaxVal { get; set; }
-
-        [Required]
-        [CheckConstraint("Measurements > 0")]
-        public int Measurements { get; set; }
     }
+
+    [Required]
+    public long StatEnumId { get; set; }
+
+    [Required]
+    [CheckConstraint("RecordId > 0")]
+    public long RecordId { get; set; }
+
+    [Required]
+    [CheckConstraint("RecordType > 0")]
+    public RecordType RecordType { get; set; }
+
+    [Required]
+    public DateTime DayUtc { get; set; }
+
+    [Required]
+    [CheckConstraint("PublisherAccountId > 0")]
+    public long PublisherAccountId { get; set; }
+
+    [Required]
+    [DecimalLength(18, 4)]
+    public double Val { get; set; }
+
+    [Required]
+    [DecimalLength(18, 4)]
+    public double MinVal { get; set; }
+
+    [Required]
+    [DecimalLength(18, 4)]
+    public double MaxVal { get; set; }
+
+    [Required]
+    [CheckConstraint("Measurements > 0")]
+    public int Measurements { get; set; }
 }

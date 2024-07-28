@@ -1,9 +1,8 @@
 using Rydr.Api.Dto.Enums;
 
-namespace Rydr.Api.Core.Interfaces.Services
+namespace Rydr.Api.Core.Interfaces.Services;
+
+public interface ISmsService
 {
-    public interface ISmsService
-    {
-        void SendSms(string phoneNumber, string message, SmsType messageType = SmsType.Transactional, string countryCode = "+1");
-    }
+    void SendSms(string phoneNumber, string message, SmsType messageType = SmsType.Transactional, string countryCode = "+1");
 }

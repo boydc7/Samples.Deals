@@ -1,10 +1,7 @@
-using System;
+namespace Rydr.Api.Core.Interfaces.Internal;
 
-namespace Rydr.Api.Core.Interfaces.Internal
+public interface IDateTimeProvider
 {
-    public interface IDateTimeProvider
-    {
-        DateTime UtcNow { get; }
-        long UtcNowTs { get; }
-    }
+    DateTime UtcNow { get; }
+    long UtcNowTs { get; }
 }

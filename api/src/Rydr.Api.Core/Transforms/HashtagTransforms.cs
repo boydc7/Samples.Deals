@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Rydr.Api.Core.Configuration;
 using Rydr.Api.Core.Enums;
 using Rydr.Api.Core.Extensions;
@@ -14,137 +12,136 @@ using ServiceStack;
 using ServiceStack.Aws.DynamoDb;
 using ServiceStack.OrmLite.Dapper;
 
-namespace Rydr.Api.Core.Transforms
+namespace Rydr.Api.Core.Transforms;
+
+public static class HashtagTransforms
 {
-    public static class HashtagTransforms
+    private static readonly Func<ILocalRequestCacheClient> _localRequestCacheClientFactory = () => RydrEnvironment.Container.Resolve<ILocalRequestCacheClient>();
+
+    public static Task<DynHashtag> GetHashtagAsync(this IPocoDynamo dynamoDb, long id, bool includeDeleted = false)
+        => dynamoDb.GetItemByRefAsync<DynHashtag>(id, id.ToStringInvariant(), DynItemType.Hashtag, includeDeleted);
+
+    public static async Task<DynHashtag> GetHashtagByNameAsync(this IPocoDynamo dynamoDb, string hashtagName, PublisherType publisherType, bool includeDeleted = false)
     {
-        private static readonly Func<ILocalRequestCacheClient> _localRequestCacheClientFactory = () => RydrEnvironment.Container.Resolve<ILocalRequestCacheClient>();
-
-        public static Task<DynHashtag> GetHashtagAsync(this IPocoDynamo dynamoDb, long id, bool includeDeleted = false)
-            => dynamoDb.GetItemByRefAsync<DynHashtag>(id, id.ToStringInvariant(), DynItemType.Hashtag, includeDeleted);
-
-        public static async Task<DynHashtag> GetHashtagByNameAsync(this IPocoDynamo dynamoDb, string hashtagName, PublisherType publisherType, bool includeDeleted = false)
+        if (hashtagName.StartsWithOrdinalCi("#") || hashtagName.StartsWithOrdinalCi("@"))
         {
-            if (hashtagName.StartsWithOrdinalCi("#") || hashtagName.StartsWithOrdinalCi("@"))
-            {
-                hashtagName = hashtagName.Substring(1);
-            }
+            hashtagName = hashtagName[1..];
+        }
 
-            var hashtagId = await _localRequestCacheClientFactory().TryGetTaskAsync(string.Concat("GetHashtagByName::", hashtagName, "|", publisherType, "|", includeDeleted),
-                                                                                    async () =>
+        var hashtagId = await _localRequestCacheClientFactory().TryGetTaskAsync(string.Concat("GetHashtagByName::", hashtagName, "|", publisherType, "|", includeDeleted),
+                                                                                async () =>
+                                                                                {
+                                                                                    var dynQuery = dynamoDb.FromQueryIndex<DynItemEdgeIdGlobalIndex>(i => i.EdgeId == hashtagName &&
+                                                                                                                                                          Dynamo.BeginsWith(i.TypeReference,
+                                                                                                                                                                            string.Concat((int)DynItemType.Hashtag, "|")));
+
+                                                                                    if (!includeDeleted)
                                                                                     {
-                                                                                        var dynQuery = dynamoDb.FromQueryIndex<DynItemEdgeIdGlobalIndex>(i => i.EdgeId == hashtagName &&
-                                                                                                                                                              Dynamo.BeginsWith(i.TypeReference,
-                                                                                                                                                                                string.Concat((int)DynItemType.Hashtag, "|")));
+                                                                                        dynQuery.Filter(i => i.DeletedOnUtc == null);
+                                                                                    }
 
-                                                                                        if (!includeDeleted)
+                                                                                    DynamoId dynamoId = null;
+
+                                                                                    foreach (var hashtagIndex in await dynQuery.ExecAsync())
+                                                                                    {
+                                                                                        var hashtag = await dynamoDb.GetItemAsync<DynHashtag>(hashtagIndex.GetDynamoId());
+
+                                                                                        if (hashtag == null || hashtag.PublisherType != publisherType)
                                                                                         {
-                                                                                            dynQuery.Filter(i => i.DeletedOnUtc == null);
+                                                                                            continue;
                                                                                         }
 
-                                                                                        DynamoId dynamoId = null;
+                                                                                        dynamoId = hashtag.ToDynamoId();
 
-                                                                                        await foreach (var hashtagIndex in dynQuery.ExecAsync())
-                                                                                        {
-                                                                                            var hashtag = await dynamoDb.GetItemAsync<DynHashtag>(hashtagIndex.GetDynamoId());
+                                                                                        break;
+                                                                                    }
 
-                                                                                            if (hashtag == null || hashtag.PublisherType != publisherType)
-                                                                                            {
-                                                                                                continue;
-                                                                                            }
+                                                                                    return dynamoId;
+                                                                                },
+                                                                                CacheConfig.LongConfig);
 
-                                                                                            dynamoId = hashtag.ToDynamoId();
+        // And now get the item - if it were already fetched above, it's a cheap cache lookup (in-memory), and this avoids and cache-clear issues
+        return hashtagId == null
+                   ? null
+                   : await dynamoDb.GetItemAsync<DynHashtag>(hashtagId);
+    }
 
-                                                                                            break;
-                                                                                        }
-
-                                                                                        return dynamoId;
-                                                                                    },
-                                                                                    CacheConfig.LongConfig);
-
-            // And now get the item - if it were already fetched above, it's a cheap cache lookup (in-memory), and this avoids and cache-clear issues
-            return hashtagId == null
-                       ? null
-                       : await dynamoDb.GetItemAsync<DynHashtag>(hashtagId);
-        }
-
-        public static Hashtag ToHashtag(this DynHashtag source)
+    public static Hashtag ToHashtag(this DynHashtag source)
+    {
+        if (source == null)
         {
-            if (source == null)
-            {
-                throw new RecordNotFoundException();
-            }
-
-            var result = source.ConvertTo<Hashtag>();
-
-            result.Stats = source.Stats?.AsList();
-
-            result.Name = source.EdgeId;
-
-            return result;
+            throw new RecordNotFoundException();
         }
 
-        public static DynHashtag ToDynHashtag(this PostHashtag source)
-            => ToDynHashtag(source.Model);
+        var result = source.ConvertTo<Hashtag>();
 
-        public static DynHashtag ToDynHashtag(this PutHashtag source, DynHashtag existingBeingUpdated)
+        result.Stats = source.Stats?.AsList();
+
+        result.Name = source.EdgeId;
+
+        return result;
+    }
+
+    public static DynHashtag ToDynHashtag(this PostHashtag source)
+        => ToDynHashtag(source.Model);
+
+    public static DynHashtag ToDynHashtag(this PutHashtag source, DynHashtag existingBeingUpdated)
+    {
+        if (existingBeingUpdated == null)
         {
-            if (existingBeingUpdated == null)
-            {
-                throw new RecordNotFoundException();
-            }
-
-            return ToDynHashtag(source.Model, existingBeingUpdated);
+            throw new RecordNotFoundException();
         }
 
-        public static DynHashtag ToDynHashtag(this Hashtag source, DynHashtag existingBeingUpdated = null, ISequenceSource sequenceSource = null)
+        return ToDynHashtag(source.Model, existingBeingUpdated);
+    }
+
+    public static DynHashtag ToDynHashtag(this Hashtag source, DynHashtag existingBeingUpdated = null, ISequenceSource sequenceSource = null)
+    {
+        var to = source.ConvertTo<DynHashtag>();
+
+        if (existingBeingUpdated == null)
+        { // New one
+            to.EdgeId = source.Name;
+            to.DynItemType = DynItemType.Hashtag;
+            to.UpdateDateTimeTrackedValues(source);
+
+            to.HashtagType = source.HashtagType == HashtagType.Unspecified
+                                 ? HashtagType.Hashtag
+                                 : source.HashtagType;
+        }
+        else
         {
-            var to = source.ConvertTo<DynHashtag>();
+            to.TypeId = existingBeingUpdated.TypeId;
+            to.Id = existingBeingUpdated.Id;
+            to.EdgeId = existingBeingUpdated.EdgeId;
+            to.UpdateDateTimeDeleteTrackedValues(existingBeingUpdated);
 
-            if (existingBeingUpdated == null)
-            { // New one
-                to.EdgeId = source.Name;
-                to.DynItemType = DynItemType.Hashtag;
-                to.UpdateDateTimeTrackedValues(source);
-
-                to.HashtagType = source.HashtagType == HashtagType.Unspecified
-                                     ? HashtagType.Hashtag
-                                     : source.HashtagType;
-            }
-            else
-            {
-                to.TypeId = existingBeingUpdated.TypeId;
-                to.Id = existingBeingUpdated.Id;
-                to.EdgeId = existingBeingUpdated.EdgeId;
-                to.UpdateDateTimeDeleteTrackedValues(existingBeingUpdated);
-
-                to.HashtagType = source.HashtagType == HashtagType.Unspecified
-                                     ? existingBeingUpdated.HashtagType == HashtagType.Unspecified
-                                           ? HashtagType.Hashtag
-                                           : existingBeingUpdated.HashtagType
-                                     : source.HashtagType;
-            }
-
-            if (to.Id <= 0)
-            {
-                to.Id = existingBeingUpdated != null && existingBeingUpdated.Id > 0
-                            ? existingBeingUpdated.Id
-                            : (sequenceSource ?? Sequences.Provider).Next();
-            }
-
-            if (to.Name.StartsWithOrdinalCi("#") || to.Name.StartsWithOrdinalCi("@"))
-            {
-                to.Name = to.Name.Substring(1);
-            }
-
-            to.Stats = source.Stats?.AsHashSet() ?? existingBeingUpdated?.Stats;
-
-            to.ReferenceId = to.Id.ToStringInvariant();
-
-            // Hashtags are generally publicly available for use by anyone
-            to.WorkspaceId = UserAuthInfo.PublicWorkspaceId;
-
-            return to;
+            to.HashtagType = source.HashtagType == HashtagType.Unspecified
+                                 ? existingBeingUpdated.HashtagType == HashtagType.Unspecified
+                                       ? HashtagType.Hashtag
+                                       : existingBeingUpdated.HashtagType
+                                 : source.HashtagType;
         }
+
+        if (to.Id <= 0)
+        {
+            to.Id = existingBeingUpdated is { Id: > 0 }
+                        ? existingBeingUpdated.Id
+                        : (sequenceSource ?? Sequences.Provider).Next();
+        }
+
+        if (to.Name.StartsWithOrdinalCi("#") || to.Name.StartsWithOrdinalCi("@"))
+        {
+            to.Name = to.Name.Substring(1);
+        }
+
+        to.Stats = source.Stats?.AsHashSet() ?? existingBeingUpdated?.Stats;
+
+        to.ReferenceId = to.Id.ToStringInvariant();
+
+        // Hashtags are generally publicly available for use by anyone
+        to.WorkspaceId = UserAuthInfo.PublicWorkspaceId;
+
+        return to;
     }
 }

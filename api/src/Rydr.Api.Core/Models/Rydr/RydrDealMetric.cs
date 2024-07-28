@@ -1,8 +1,8 @@
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE DealMetrics;
 CREATE TABLE DealMetrics
 (
@@ -41,107 +41,106 @@ RequestTrueEngagementRating DECIMAL(18,8) NOT NULL,
 PRIMARY KEY (Timestamp, DealPublisherAccountId, MetricType, RequestPublisherAccountId, DealId, DealStatus)
 );
 ")]
-    [Alias("DealMetrics")]
-    public class RydrDealMetric
-    {
-        [Required]
-        public long Timestamp { get; set; }
+[Alias("DealMetrics")]
+public class RydrDealMetric
+{
+    [Required]
+    public long Timestamp { get; set; }
 
-        [Required]
-        public int MetricType { get; set; }
+    [Required]
+    public int MetricType { get; set; }
 
-        [Required]
-        public long UserId { get; set; }
+    [Required]
+    public long UserId { get; set; }
 
-        [Required]
-        public long WorkspaceId { get; set; }
+    [Required]
+    public long WorkspaceId { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double Latitude { get; set; }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double Latitude { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double Longitude { get; set; }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double Longitude { get; set; }
 
-        [Required]
-        public long DealId { get; set; }
+    [Required]
+    public long DealId { get; set; }
 
-        [Required]
-        public long DealPublisherAccountId { get; set; }
+    [Required]
+    public long DealPublisherAccountId { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double DealValue { get; set; }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double DealValue { get; set; }
 
-        [Required]
-        public long DealPlaceId { get; set; }
+    [Required]
+    public long DealPlaceId { get; set; }
 
-        [Required]
-        public long DealReceivePlaceId { get; set; }
+    [Required]
+    public long DealReceivePlaceId { get; set; }
 
-        [Required]
-        public int DealStatus { get; set; }
+    [Required]
+    public int DealStatus { get; set; }
 
-        [Required]
-        public bool IsPrivateDeal { get; set; }
+    [Required]
+    public bool IsPrivateDeal { get; set; }
 
-        [Required]
-        public int DealMinAge { get; set; }
+    [Required]
+    public int DealMinAge { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double DealDistanceMiles { get; set; }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double DealDistanceMiles { get; set; }
 
-        [Required]
-        public int DealPublisherAgeRangeMin { get; set; }
+    [Required]
+    public int DealPublisherAgeRangeMin { get; set; }
 
-        [Required]
-        public int DealPublisherAgeRangeMax { get; set; }
+    [Required]
+    public int DealPublisherAgeRangeMax { get; set; }
 
-        [Required]
-        public int DealPublisherGender { get; set; }
+    [Required]
+    public int DealPublisherGender { get; set; }
 
-        [Required]
-        public int RequestAgeRangeMin { get; set; }
+    [Required]
+    public int RequestAgeRangeMin { get; set; }
 
-        [Required]
-        public int RequestAgeRangeMax { get; set; }
+    [Required]
+    public int RequestAgeRangeMax { get; set; }
 
-        [Required]
-        public int RequestGender { get; set; }
+    [Required]
+    public int RequestGender { get; set; }
 
-        [Required]
-        public int RequestFollowedBy { get; set; }
+    [Required]
+    public int RequestFollowedBy { get; set; }
 
-        [Required]
-        public int RequestRecentStories { get; set; }
+    [Required]
+    public int RequestRecentStories { get; set; }
 
-        [Required]
-        public int RequestRecentMedias { get; set; }
+    [Required]
+    public int RequestRecentMedias { get; set; }
 
-        [Required]
-        public long RequestRecentStoryImpressions { get; set; }
+    [Required]
+    public long RequestRecentStoryImpressions { get; set; }
 
-        [Required]
-        public long RequestRecentMediaImpressions { get; set; }
+    [Required]
+    public long RequestRecentMediaImpressions { get; set; }
 
-        [Required]
-        public long RequestRecentStoryReach { get; set; }
+    [Required]
+    public long RequestRecentStoryReach { get; set; }
 
-        [Required]
-        public long RequestRecentMediaReach { get; set; }
+    [Required]
+    public long RequestRecentMediaReach { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double RequestStoryEngagementRating { get; set; }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double RequestStoryEngagementRating { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double RequestEngagementRating { get; set; }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double RequestEngagementRating { get; set; }
 
-        [Required]
-        [DecimalLength(18, 8)]
-        public double RequestTrueEngagementRating { get; set; }
-    }
+    [Required]
+    [DecimalLength(18, 8)]
+    public double RequestTrueEngagementRating { get; set; }
 }

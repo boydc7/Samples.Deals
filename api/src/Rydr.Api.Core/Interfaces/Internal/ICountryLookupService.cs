@@ -1,7 +1,6 @@
-namespace Rydr.Api.Core.Interfaces.Internal
+namespace Rydr.Api.Core.Interfaces.Internal;
+
+public interface ICountryLookupService
 {
-    public interface ICountryLookupService
-    {
-        string GetCountryNameFromTwoLetterIso(string twoLetterCode);
-    }
+    string GetCountryNameFromTwoLetterIso(string twoLetterCode);
 }

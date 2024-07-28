@@ -1,11 +1,10 @@
-namespace Rydr.FbSdk.Enums
+namespace Rydr.FbSdk.Enums;
+
+public enum FbTokenType
 {
-    public enum FbTokenType
-    {
-        Unknown,
-        User,
-        App,
-        Page,
-        Client
-    }
+    Unknown,
+    User,
+    App,
+    Page,
+    Client
 }

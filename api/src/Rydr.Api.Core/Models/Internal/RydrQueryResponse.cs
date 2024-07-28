@@ -1,20 +1,18 @@
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Rydr.Api.Dto.Interfaces;
 using ServiceStack;
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Core.Models.Internal
+namespace Rydr.Api.Core.Models.Internal;
+
+public class RydrQueryResponse<T> : QueryResponse<T>, IHaveResults<T>, IHaveResults
+    where T : class
 {
-    public class RydrQueryResponse<T> : QueryResponse<T>, IHaveResults<T>, IHaveResults
-        where T : class
-    {
-        [Ignore]
-        [IgnoreDataMember]
-        public IReadOnlyList<object> ResultObjs => Results;
+    [Ignore]
+    [IgnoreDataMember]
+    public IReadOnlyList<object> ResultObjs => Results;
 
-        public new IReadOnlyList<T> Results { get; set; }
+    public new IReadOnlyList<T> Results { get; set; }
 
-        public int ResultCount => Results?.Count ?? 0;
-    }
+    public int ResultCount => Results?.Count ?? 0;
 }

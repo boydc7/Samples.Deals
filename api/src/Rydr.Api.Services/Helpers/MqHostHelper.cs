@@ -1,46 +1,43 @@
-using System;
-using System.Threading.Tasks;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 
-namespace Rydr.Api.Services.Helpers
+namespace Rydr.Api.Services.Helpers;
+
+public class MqHostHelper
 {
-    public class MqHostHelper
+    private static readonly ILog _log = LogManager.GetLogger("MqHostHelper");
+
+    private MqHostHelper() { }
+
+    public static MqHostHelper Instance { get; } = new();
+
+    public void ShutdownHosts(IMessageService mqHost, IServerEvents eventBroker)
     {
-        private static readonly ILog _log = LogManager.GetLogger("MqHostHelper");
+        var mqTask = Task.Run(() => ShutdownMqHost(mqHost));
 
-        private MqHostHelper() { }
+        Task.WaitAll(new[]
+                     {
+                         mqTask
+                     }, TimeSpan.FromMinutes(9));
+    }
 
-        public static MqHostHelper Instance { get; } = new MqHostHelper();
-
-        public void ShutdownHosts(IMessageService mqHost, IServerEvents eventBroker)
+    private void ShutdownMqHost(IMessageService mqHost)
+    {
+        if (mqHost == null)
         {
-            var mqTask = Task.Run(() => ShutdownMqHost(mqHost));
-
-            Task.WaitAll(new[]
-                         {
-                             mqTask
-                         }, TimeSpan.FromMinutes(9));
+            return;
         }
 
-        private void ShutdownMqHost(IMessageService mqHost)
+        try
         {
-            if (mqHost == null)
-            {
-                return;
-            }
-
-            try
-            {
-                _log.Info("Shutdown of MqHost starting");
-                mqHost.Stop();
-                _log.Info("Shutdown of MqHost complete");
-            }
-            catch(Exception ex)
-            {
-                _log.Warn("Exception trying to Shutdown the MqHost.", ex);
-            }
+            _log.Info("Shutdown of MqHost starting");
+            mqHost.Stop();
+            _log.Info("Shutdown of MqHost complete");
+        }
+        catch(Exception ex)
+        {
+            _log.Warn("Exception trying to Shutdown the MqHost.", ex);
         }
     }
 }

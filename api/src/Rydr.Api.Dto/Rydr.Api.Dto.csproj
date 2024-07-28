@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <OutputType>Library</OutputType>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
         <Configurations>Debug;Release;LocalDevelopment;LocalProduction;Development;LocalDocker</Configurations>
-        <Platforms>AnyCPU</Platforms>
-        <LangVersion>default</LangVersion>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,9 +46,7 @@
         <Optimize>false</Optimize>
     </PropertyGroup>
     <ItemGroup>
-      <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Interfaces.dll</HintPath>
-      </Reference>
+      <PackageReference Include="ServiceStack.Interfaces" Version="8.3.0" />
     </ItemGroup>
 
 </Project>

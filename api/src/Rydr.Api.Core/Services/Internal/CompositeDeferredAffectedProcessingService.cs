@@ -1,25 +1,22 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Rydr.Api.Core.Interfaces.Services;
 using Rydr.Api.Dto.Shared;
 
-namespace Rydr.Api.Core.Services.Internal
+namespace Rydr.Api.Core.Services.Internal;
+
+public class CompositeDeferredAffectedProcessingService : IDeferredAffectedProcessingService
 {
-    public class CompositeDeferredAffectedProcessingService : IDeferredAffectedProcessingService
+    private readonly IEnumerable<IDeferredAffectedProcessingService> _services;
+
+    public CompositeDeferredAffectedProcessingService(IEnumerable<IDeferredAffectedProcessingService> services)
     {
-        private readonly IEnumerable<IDeferredAffectedProcessingService> _services;
+        _services = services;
+    }
 
-        public CompositeDeferredAffectedProcessingService(IEnumerable<IDeferredAffectedProcessingService> services)
+    public async Task ProcessAsync(PostDeferredAffected request)
+    {
+        foreach (var service in _services)
         {
-            _services = services;
-        }
-
-        public async Task ProcessAsync(PostDeferredAffected request)
-        {
-            foreach (var service in _services)
-            {
-                await service.ProcessAsync(request);
-            }
+            await service.ProcessAsync(request);
         }
     }
 }

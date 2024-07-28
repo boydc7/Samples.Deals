@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Funq;
 using MySql.Data.MySqlClient;
 using Rydr.Api.Core.Enums;
@@ -14,160 +12,159 @@ using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 
-namespace Rydr.Api.Core.Configuration
+namespace Rydr.Api.Core.Configuration;
+
+public abstract class MessagingConfiguration : IAppHostConfigurer
 {
-    public abstract class MessagingConfiguration : IAppHostConfigurer
+    private readonly List<string> _registeredMessageQueueTypeNames = new();
+
+    public const int DefaultRetryCount = 3;
+
+    protected readonly ILog _log;
+
+    protected MessagingConfiguration()
     {
-        private readonly List<string> _registeredMessageQueueTypeNames = new List<string>();
+        _log = LogManager.GetLogger(GetType());
+    }
 
-        public const int DefaultRetryCount = 3;
+    public IMessageService MqHost { get; private set; }
 
-        protected readonly ILog _log;
+    public virtual void Apply(ServiceStackHost appHost, Container container)
+    {
+        QueueNames.SetQueuePrefix(RydrEnvironment.GetAppSetting("AWS.SQS.QueueNamePrefix", ""));
 
-        protected MessagingConfiguration()
+        RegisterMq(appHost, container);
+    }
+
+    private void RegisterMq(ServiceStackHost appHost, Container container)
+    {
+        MqHost = GetMessageService(container);
+
+        container.Register(MqHost);
+        container.Register(c => MqHost.MessageFactory);
+
+        if (RydrEnvironment.GetAppSetting("Messaging.DisableReadHandling", false))
         {
-            _log = LogManager.GetLogger(GetType());
+            _log.Info("Message READ handling disabled on this service due to Messaging.DisableReadHandling configuration setting being on.");
         }
-
-        public IMessageService MqHost { get; private set; }
-
-        public virtual void Apply(ServiceStackHost appHost, Container container)
-        {
-            QueueNames.SetQueuePrefix(RydrEnvironment.GetAppSetting("AWS.SQS.QueueNamePrefix", ""));
-
-            RegisterMq(appHost, container);
-        }
-
-        private void RegisterMq(ServiceStackHost appHost, Container container)
-        {
-            MqHost = GetMessageService(container);
-
-            container.Register(MqHost);
-            container.Register(c => MqHost.MessageFactory);
-
-            if (RydrEnvironment.GetAppSetting("Messaging.DisableReadHandling", false))
-            {
-                _log.Info("Message READ handling disabled on this service due to Messaging.DisableReadHandling configuration setting being on.");
-            }
-            else
-            { // Those which depend on the config
-                RegisterWithConfigThreads(appHost, MqHost, 2,
-                                          dlqProcessPredicates: new Func<IMessage<PostDeferredAffected>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => ra > (DefaultRetryCount * 2) ||
-                                                                                 (DateTimeHelper.UtcNow - msg.CreatedDate).TotalDays > 35
+        else
+        { // Those which depend on the config
+            RegisterWithConfigThreads(appHost, MqHost, 2,
+                                      dlqProcessPredicates: new Func<IMessage<PostDeferredAffected>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => ra > (DefaultRetryCount * 2) ||
+                                                                             (DateTimeHelper.UtcNow - msg.CreatedDate).TotalDays > 35
+                                                                                 ? MqProcessType.Archive
+                                                                                 : MqProcessType.Unspecified,
+                                                                (msg, ra) => msg.Error == null ||
+                                                                             !msg.Error.ErrorCode.ContainsSafe(nameof(MySqlException)) ||
+                                                                             !msg.Error.Message.ContainsSafe("Duplicate entry ")
+                                                                                 ? MqProcessType.Unspecified
+                                                                                 : MqProcessType.Ignore,
+                                                                (msg, ra) => msg.Error == null ||
+                                                                             !msg.Error.ErrorCode.ContainsSafe(nameof(RecordNotFoundException)) ||
+                                                                             !msg.Error.Message.ContainsSafe("Record was not found ")
+                                                                                 ? MqProcessType.Unspecified
+                                                                                 : ra > (DefaultRetryCount + 2)
                                                                                      ? MqProcessType.Archive
-                                                                                     : MqProcessType.Unspecified,
-                                                                    (msg, ra) => msg.Error == null ||
-                                                                                 !msg.Error.ErrorCode.ContainsSafe(nameof(MySqlException)) ||
-                                                                                 !msg.Error.Message.ContainsSafe("Duplicate entry ")
-                                                                                     ? MqProcessType.Unspecified
-                                                                                     : MqProcessType.Ignore,
-                                                                    (msg, ra) => msg.Error == null ||
-                                                                                 !msg.Error.ErrorCode.ContainsSafe(nameof(RecordNotFoundException)) ||
-                                                                                 !msg.Error.Message.ContainsSafe("Record was not found ")
-                                                                                     ? MqProcessType.Unspecified
-                                                                                     : ra > (DefaultRetryCount + 2)
-                                                                                         ? MqProcessType.Archive
-                                                                                         : MqProcessType.Reprocess,
-                                                                });
+                                                                                     : MqProcessType.Reprocess,
+                                                            });
 
-                RegisterWithConfigThreads(appHost, MqHost, 2, isFifoQueue: true,
-                                          dlqProcessPredicates: new Func<IMessage<PostDeferredFifoMessage>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => ra > (DefaultRetryCount + 1)
-                                                                                     ? MqProcessType.Alert
-                                                                                     : MqProcessType.Reprocess
-                                                                });
+            RegisterWithConfigThreads(appHost, MqHost, 2, isFifoQueue: true,
+                                      dlqProcessPredicates: new Func<IMessage<PostDeferredFifoMessage>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => ra > (DefaultRetryCount + 1)
+                                                                                 ? MqProcessType.Alert
+                                                                                 : MqProcessType.Reprocess
+                                                            });
 
-                RegisterWithConfigThreads(appHost, MqHost, 2,
-                                          dlqProcessPredicates: new Func<IMessage<PostDeferredDealMessage>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => ra > (DefaultRetryCount + 1)
-                                                                                     ? MqProcessType.Alert
-                                                                                     : MqProcessType.Reprocess
-                                                                });
+            RegisterWithConfigThreads(appHost, MqHost, 2,
+                                      dlqProcessPredicates: new Func<IMessage<PostDeferredDealMessage>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => ra > (DefaultRetryCount + 1)
+                                                                                 ? MqProcessType.Alert
+                                                                                 : MqProcessType.Reprocess
+                                                            });
 
-                RegisterWithConfigThreads(appHost, MqHost, 2,
-                                          dlqProcessPredicates: new Func<IMessage<PostDeferredPrimaryDealMessage>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => msg.RetryAttempts > (DefaultRetryCount + 1)
-                                                                                     ? MqProcessType.Alert
-                                                                                     : MqProcessType.Reprocess
-                                                                });
+            RegisterWithConfigThreads(appHost, MqHost, 2,
+                                      dlqProcessPredicates: new Func<IMessage<PostDeferredPrimaryDealMessage>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => msg.RetryAttempts > (DefaultRetryCount + 1)
+                                                                                 ? MqProcessType.Alert
+                                                                                 : MqProcessType.Reprocess
+                                                            });
 
-                RegisterWithConfigThreads(appHost, MqHost, 2,
-                                          dlqProcessPredicates: new Func<IMessage<PostDeferredMessage>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => ra > (DefaultRetryCount * 2) ||
-                                                                                 (DateTimeHelper.UtcNow - msg.CreatedDate).TotalDays > 35
-                                                                                     ? MqProcessType.Archive
-                                                                                     : MqProcessType.Unspecified
-                                                                });
+            RegisterWithConfigThreads(appHost, MqHost, 2,
+                                      dlqProcessPredicates: new Func<IMessage<PostDeferredMessage>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => ra > (DefaultRetryCount * 2) ||
+                                                                             (DateTimeHelper.UtcNow - msg.CreatedDate).TotalDays > 35
+                                                                                 ? MqProcessType.Archive
+                                                                                 : MqProcessType.Unspecified
+                                                            });
 
-                RegisterWithConfigThreads(appHost, MqHost, 1,
-                                          dlqProcessPredicates: new Func<IMessage<PostDeferredLowPriMessage>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => ra > (DefaultRetryCount * 2) ||
-                                                                                 (DateTimeHelper.UtcNow - msg.CreatedDate).TotalDays > 35
-                                                                                     ? MqProcessType.Archive
-                                                                                     : MqProcessType.Unspecified
-                                                                });
+            RegisterWithConfigThreads(appHost, MqHost, 1,
+                                      dlqProcessPredicates: new Func<IMessage<PostDeferredLowPriMessage>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => ra > (DefaultRetryCount * 2) ||
+                                                                             (DateTimeHelper.UtcNow - msg.CreatedDate).TotalDays > 35
+                                                                                 ? MqProcessType.Archive
+                                                                                 : MqProcessType.Unspecified
+                                                            });
 
-                RegisterWithConfigThreads(appHost, MqHost, 2, 0,
-                                          dlqProcessPredicates: new Func<IMessage<PostSyncRecentPublisherAccountMedia>, long, MqProcessType>[]
-                                                                {
-                                                                    (msg, ra) => MqProcessType.Ignore
-                                                                });
-            }
-
-            if (!_registeredMessageQueueTypeNames.IsNullOrEmpty())
-            {
-                container.Register("MessageQueueProcessorRegisteredTypeNames", _registeredMessageQueueTypeNames);
-            }
+            RegisterWithConfigThreads(appHost, MqHost, 2, 0,
+                                      dlqProcessPredicates: new Func<IMessage<PostSyncRecentPublisherAccountMedia>, long, MqProcessType>[]
+                                                            {
+                                                                (msg, ra) => MqProcessType.Ignore
+                                                            });
         }
 
-        protected abstract IMessageService GetMessageService(Container container);
-        protected abstract void Register<T>(ServiceStackHost appHost, IMessageService mqHost, int threads = 0, int? retryCount = null, int? visibilityTimeoutSeconds = null, bool isFifoQueue = false);
-
-        protected void RegisterHandler<T>(ServiceStackHost appHost, IMessageService mqHost, int threads = 0, int? retryCount = null,
-                                          int? visibilityTimeoutSeconds = null, bool isFifoQueue = false,
-                                          IEnumerable<Func<IMessage<T>, long, MqProcessType>> dlqProcessPredicates = null)
+        if (!_registeredMessageQueueTypeNames.IsNullOrEmpty())
         {
-            appHost.Container
-                   .Register<IMessageQueueProcessor>(typeof(T).Name, c => new ManualMessageQueueProcessor<T>(c.Resolve<IMessageFactory>(),
-                                                                                                             c.Resolve<IFileStorageProvider>(),
-                                                                                                             c.Resolve<IOpsNotificationService>(),
-                                                                                                             c.Resolve<IPersistentCounterAndListService>(),
-                                                                                                             dlqProcessPredicates))
-                   .ReusedWithin(ReuseScope.Hierarchy);
+            container.Register("MessageQueueProcessorRegisteredTypeNames", _registeredMessageQueueTypeNames);
+        }
+    }
 
-            _registeredMessageQueueTypeNames.Add(typeof(T).Name);
+    protected abstract IMessageService GetMessageService(Container container);
+    protected abstract void Register<T>(ServiceStackHost appHost, IMessageService mqHost, int threads = 0, int? retryCount = null, int? visibilityTimeoutSeconds = null, bool isFifoQueue = false);
 
-            if (RydrEnvironment.GetAppSetting("Messaging.DisableAll", false))
-            {
-                threads = 1;
-            }
+    protected void RegisterHandler<T>(ServiceStackHost appHost, IMessageService mqHost, int threads = 0, int? retryCount = null,
+                                      int? visibilityTimeoutSeconds = null, bool isFifoQueue = false,
+                                      IEnumerable<Func<IMessage<T>, long, MqProcessType>> dlqProcessPredicates = null)
+    {
+        appHost.Container
+               .Register<IMessageQueueProcessor>(typeof(T).Name, c => new ManualMessageQueueProcessor<T>(c.Resolve<IMessageFactory>(),
+                                                                                                         c.Resolve<IFileStorageProvider>(),
+                                                                                                         c.Resolve<IOpsNotificationService>(),
+                                                                                                         c.Resolve<IPersistentCounterAndListService>(),
+                                                                                                         dlqProcessPredicates))
+               .ReusedWithin(ReuseScope.Hierarchy);
 
-            Register<T>(appHost, mqHost, threads, retryCount, visibilityTimeoutSeconds, isFifoQueue);
+        _registeredMessageQueueTypeNames.Add(typeof(T).Name);
+
+        if (RydrEnvironment.GetAppSetting("Messaging.DisableAll", false))
+        {
+            threads = 1;
         }
 
-        protected void RegisterWithConfigThreads<T>(ServiceStackHost appHost, IMessageService mqHost, int defaultThreadsIfNoConfig = 0,
-                                                    int defaultRetriesIfNoConfig = 3, int? visibilityTimeoutSeconds = null, bool isFifoQueue = false,
-                                                    IEnumerable<Func<IMessage<T>, long, MqProcessType>> dlqProcessPredicates = null)
+        Register<T>(appHost, mqHost, threads, retryCount, visibilityTimeoutSeconds, isFifoQueue);
+    }
+
+    protected void RegisterWithConfigThreads<T>(ServiceStackHost appHost, IMessageService mqHost, int defaultThreadsIfNoConfig = 0,
+                                                int defaultRetriesIfNoConfig = 3, int? visibilityTimeoutSeconds = null, bool isFifoQueue = false,
+                                                IEnumerable<Func<IMessage<T>, long, MqProcessType>> dlqProcessPredicates = null)
+    {
+        var threadsAppSettingName = string.Concat("Messaging.Threads.", typeof(T).Name);
+
+        var threads = RydrEnvironment.GetAppSetting(threadsAppSettingName, defaultThreadsIfNoConfig.ToString()).ToInt(defaultThreadsIfNoConfig);
+
+        var retriesAppSettingName = string.Concat("Messaging.RetryCount.", typeof(T).Name);
+
+        var retries = RydrEnvironment.GetAppSetting(retriesAppSettingName, defaultRetriesIfNoConfig.ToString()).ToInt(defaultRetriesIfNoConfig);
+
+        if (threads > 0)
         {
-            var threadsAppSettingName = string.Concat("Messaging.Threads.", typeof(T).Name);
-
-            var threads = RydrEnvironment.GetAppSetting(threadsAppSettingName, defaultThreadsIfNoConfig.ToString()).ToInt(defaultThreadsIfNoConfig);
-
-            var retriesAppSettingName = string.Concat("Messaging.RetryCount.", typeof(T).Name);
-
-            var retries = RydrEnvironment.GetAppSetting(retriesAppSettingName, defaultRetriesIfNoConfig.ToString()).ToInt(defaultRetriesIfNoConfig);
-
-            if (threads > 0)
-            {
-                RegisterHandler(appHost, mqHost, threads, retries, visibilityTimeoutSeconds, isFifoQueue, dlqProcessPredicates);
-            }
+            RegisterHandler(appHost, mqHost, threads, retries, visibilityTimeoutSeconds, isFifoQueue, dlqProcessPredicates);
         }
     }
 }

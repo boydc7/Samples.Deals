@@ -1,9 +1,8 @@
-namespace Rydr.Api.Core.Enums
+namespace Rydr.Api.Core.Enums;
+
+public enum ElasticSearchWildcardDelimiter
 {
-    public enum ElasticSearchWildcardDelimiter
-    {
-        None,
-        And,
-        Space
-    }
+    None,
+    And,
+    Space
 }

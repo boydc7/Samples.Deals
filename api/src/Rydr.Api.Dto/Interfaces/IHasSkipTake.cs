@@ -1,8 +1,7 @@
-namespace Rydr.Api.Dto.Interfaces
+namespace Rydr.Api.Dto.Interfaces;
+
+public interface IHasSkipTake
 {
-    public interface IHasSkipTake
-    {
-        int Skip { get; set; }
-        int Take { get; set; }
-    }
+    int Skip { get; set; }
+    int Take { get; set; }
 }

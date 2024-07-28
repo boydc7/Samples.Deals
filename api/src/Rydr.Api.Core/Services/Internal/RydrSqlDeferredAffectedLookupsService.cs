@@ -1,55 +1,51 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Rydr.Api.Core.Interfaces.Services;
 using Rydr.Api.Dto.Shared;
 using ServiceStack;
 
-namespace Rydr.Api.Core.Services.Internal
+namespace Rydr.Api.Core.Services.Internal;
+
+public class RydrSqlDeferredAffectedLookupsService : IDeferredAffectedProcessingService
 {
-    public class RydrSqlDeferredAffectedLookupsService : IDeferredAffectedProcessingService
+    private readonly IRecordTypeRecordService _rtRecordService;
+
+    public RydrSqlDeferredAffectedLookupsService(IRecordTypeRecordService rtRecordService)
     {
-        private readonly IRecordTypeRecordService _rtRecordService;
+        _rtRecordService = rtRecordService;
+    }
 
-        public RydrSqlDeferredAffectedLookupsService(IRecordTypeRecordService rtRecordService)
+    public async Task ProcessAsync(PostDeferredAffected request)
+    {
+        var attempt = 1;
+        Exception lastEx = null;
+
+        do
         {
-            _rtRecordService = rtRecordService;
-        }
-
-        public async Task ProcessAsync(PostDeferredAffected request)
-        {
-            var attempt = 1;
-            Exception lastEx = null;
-
-            do
+            try
             {
-                try
+                if (request.CompositeIds.IsNullOrEmpty())
                 {
-                    if (request.CompositeIds.IsNullOrEmpty())
-                    {
-                        await _rtRecordService.SaveRydrRecordsAsync(request.Type, request.Ids);
-                    }
-                    else
-                    {
-                        await _rtRecordService.SaveRydrRecordsAsync(request.Type, request.CompositeIds);
-                    }
-
-                    return;
+                    await _rtRecordService.SaveRydrRecordsAsync(request.Type, request.Ids);
                 }
-                catch(MySqlException myx) when(myx.Message.ContainsAny(new[]
-                                                                       {
-                                                                           "Duplicate", "Deadlock"
-                                                                       }, StringComparison.OrdinalIgnoreCase))
+                else
                 {
-                    Thread.Sleep(attempt * 750);
-                    lastEx = myx;
+                    await _rtRecordService.SaveRydrRecordsAsync(request.Type, request.CompositeIds);
                 }
 
-                attempt++;
-            } while (attempt < 4);
+                return;
+            }
+            catch(MySqlException myx) when(myx.Message.ContainsAny(new[]
+                                                                   {
+                                                                       "Duplicate", "Deadlock"
+                                                                   }, StringComparison.OrdinalIgnoreCase))
+            {
+                Thread.Sleep(attempt * 750);
+                lastEx = myx;
+            }
 
-            throw lastEx;
-        }
+            attempt++;
+        } while (attempt < 4);
+
+        throw lastEx;
     }
 }

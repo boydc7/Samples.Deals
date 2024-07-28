@@ -1,9 +1,8 @@
-namespace Rydr.Api.Core.Enums
+namespace Rydr.Api.Core.Enums;
+
+public enum EncryptionKeyType
 {
-    public enum EncryptionKeyType
-    {
-        GeneralEncryptionKey,
-        ExternalEncryptionKey,
-        SensitiveEncryptionKey
-    }
+    GeneralEncryptionKey,
+    ExternalEncryptionKey,
+    SensitiveEncryptionKey
 }

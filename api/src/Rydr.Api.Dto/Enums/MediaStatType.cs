@@ -1,13 +1,12 @@
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Dto.Enums
+namespace Rydr.Api.Dto.Enums;
+
+[EnumAsInt]
+public enum MediaStatType
 {
-    [EnumAsInt]
-    public enum MediaStatType
-    {
-        Unknown, // 0
-        MediaCount,
-        Followers,
-        FollowedBy
-    }
+    Unknown, // 0
+    MediaCount,
+    Followers,
+    FollowedBy
 }

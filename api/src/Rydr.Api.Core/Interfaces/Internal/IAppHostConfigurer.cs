@@ -1,10 +1,9 @@
 using Funq;
 using ServiceStack;
 
-namespace Rydr.Api.Core.Interfaces.Internal
+namespace Rydr.Api.Core.Interfaces.Internal;
+
+public interface IAppHostConfigurer
 {
-    public interface IAppHostConfigurer
-    {
-        void Apply(ServiceStackHost appHost, Container container);
-    }
+    void Apply(ServiceStackHost appHost, Container container);
 }

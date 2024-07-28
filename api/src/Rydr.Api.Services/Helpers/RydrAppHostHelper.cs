@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
 using Amazon.Runtime;
 using FirebaseAdmin;
 using Funq;
@@ -33,84 +30,84 @@ using ServiceStack.OrmLite.Dapper;
 using ServiceStack.Validation;
 using LogManager = NLog.LogManager;
 
-namespace Rydr.Api.Services.Helpers
+namespace Rydr.Api.Services.Helpers;
+
+public class RydrAppHostHelper
 {
-    public class RydrAppHostHelper
+    private IMessageService _mqHost;
+    private int _inShutdown;
+    private int _inStartup = 1;
+
+    private RydrAppHostHelper()
     {
-        private IMessageService _mqHost;
-        private int _inShutdown;
-        private int _inStartup = 1;
+        Licensing.RegisterLicense(@"7376-e1JlZjo3Mzc2LE5hbWU6IlJ5ZHIgVGVjaG5vbG9naWVzLCBJbmMiLFR5cGU6SW5kaWUsTWV0YTowLEhhc2g6RnRLMzhRWTJTMXU1OWdHVUJ5TGM1ZlN2dHREY3hCWVBvQ3Y2NDZmWWtFVlJZKzhycUYwUno1MzNmUE1LRmlYdUg3MmJWZmFuenQ3Sml0eG5XQVJFeEtMa3VCNUpkdXhxcGd5Ykw5cGhVeVluRmdJNFhQYmFOejY4dVNGZGdFa25YcHF1OG50Z3dianErcmVSUVQyb2FTSGJWNGhpYlVjZW9sWittdnZ4bHNNPSxFeHBpcnk6MjAyMC0wNi0xMn0=");
+    }
 
-        private RydrAppHostHelper()
+    public static RydrAppHostHelper Instance { get; } = new();
+
+    public ILog Log { get; private set; }
+
+    public bool InStartup => _inStartup > 0;
+
+    public string ClientUrlRoot => RydrUrls.ClientRootUri?.AbsoluteUri;
+
+    public string WebHostCustomPath => RydrUrls.WebHostCustomPath;
+
+    public void Create() { }
+
+    public void OnBeforeRun(ServiceStackHost host)
+    {
+        // Resolve the Hangfire server to start it...
+        host.Container.Resolve<BackgroundJobServer>();
+
+        _mqHost.Start();
+        _mqHost = null;
+
+        // Ensure system-wide ongoing jobs are configured
+        if (RydrEnvironment.IsReleaseEnvironment)
         {
-            Licensing.RegisterLicense(@"7376-e1JlZjo3Mzc2LE5hbWU6IlJ5ZHIgVGVjaG5vbG9naWVzLCBJbmMiLFR5cGU6SW5kaWUsTWV0YTowLEhhc2g6RnRLMzhRWTJTMXU1OWdHVUJ5TGM1ZlN2dHREY3hCWVBvQ3Y2NDZmWWtFVlJZKzhycUYwUno1MzNmUE1LRmlYdUg3MmJWZmFuenQ3Sml0eG5XQVJFeEtMa3VCNUpkdXhxcGd5Ykw5cGhVeVluRmdJNFhQYmFOejY4dVNGZGdFa25YcHF1OG50Z3dianErcmVSUVQyb2FTSGJWNGhpYlVjZW9sWittdnZ4bHNNPSxFeHBpcnk6MjAyMC0wNi0xMn0=");
-        }
+            var deferRequestsService = host.Container.Resolve<IDeferRequestsService>();
 
-        public static RydrAppHostHelper Instance { get; } = new RydrAppHostHelper();
-
-        public ILog Log { get; private set; }
-
-        public bool InStartup => _inStartup > 0;
-
-        public string ClientUrlRoot => RydrUrls.ClientRootUri?.AbsoluteUri;
-
-        public string WebHostCustomPath => RydrUrls.WebHostCustomPath;
-
-        public void Create() { }
-
-        public void OnBeforeRun(ServiceStackHost host)
-        {
-            // Resolve the Hangfire server to start it...
-            host.Container.Resolve<BackgroundJobServer>();
-
-            _mqHost.Start();
-            _mqHost = null;
-
-            // Ensure system-wide ongoing jobs are configured
-            if (RydrEnvironment.IsReleaseEnvironment)
+            if (HumanLoopService.HumanBusinessCategoryFlowArn.HasValue())
             {
-                var deferRequestsService = host.Container.Resolve<IDeferRequestsService>();
-
-                if (HumanLoopService.HumanBusinessCategoryFlowArn.HasValue())
-                {
-                    deferRequestsService.PublishMessageRecurring(new PostDeferredLowPriMessage
-                                                                 {
-                                                                     Dto = new PostProcessHumanLoop
-                                                                           {
-                                                                               LoopIdentifier = HumanLoopService.HumanBusinessCategoryFlowArn,
-                                                                               HoursBack = 50
-                                                                           }.WithAdminRequestInfo()
-                                                                            .ToJsv(),
-                                                                     Type = typeof(PostProcessHumanLoop).FullName
-                                                                 }.WithAdminRequestInfo(),
-                                                                 CronBuilder.Minutely(18),
-                                                                 PostProcessHumanLoop.GetRecurringJobId(HumanLoopService.PublisherAccountBusinessCategoryPrefix));
-                }
-
-                if (HumanLoopService.HumanCreatorCategoryFlowArn.HasValue())
-                {
-                    deferRequestsService.PublishMessageRecurring(new PostDeferredLowPriMessage
-                                                                 {
-                                                                     Dto = new PostProcessHumanLoop
-                                                                           {
-                                                                               LoopIdentifier = HumanLoopService.HumanCreatorCategoryFlowArn,
-                                                                               HoursBack = 50
-                                                                           }.WithAdminRequestInfo()
-                                                                            .ToJsv(),
-                                                                     Type = typeof(PostProcessHumanLoop).FullName
-                                                                 }.WithAdminRequestInfo(),
-                                                                 CronBuilder.Minutely(17),
-                                                                 PostProcessHumanLoop.GetRecurringJobId(HumanLoopService.PublisherAccountCreatorCategoryPrefix));
-                }
+                deferRequestsService.PublishMessageRecurring(new PostDeferredLowPriMessage
+                                                             {
+                                                                 Dto = new PostProcessHumanLoop
+                                                                     {
+                                                                         LoopIdentifier = HumanLoopService.HumanBusinessCategoryFlowArn,
+                                                                         HoursBack = 50
+                                                                     }.WithAdminRequestInfo()
+                                                                      .ToJsv(),
+                                                                 Type = typeof(PostProcessHumanLoop).FullName
+                                                             }.WithAdminRequestInfo(),
+                                                             CronBuilder.Minutely(18),
+                                                             PostProcessHumanLoop.GetRecurringJobId(HumanLoopService.PublisherAccountBusinessCategoryPrefix));
             }
 
-            Interlocked.Exchange(ref _inStartup, 0);
+            if (HumanLoopService.HumanCreatorCategoryFlowArn.HasValue())
+            {
+                deferRequestsService.PublishMessageRecurring(new PostDeferredLowPriMessage
+                                                             {
+                                                                 Dto = new PostProcessHumanLoop
+                                                                     {
+                                                                         LoopIdentifier = HumanLoopService.HumanCreatorCategoryFlowArn,
+                                                                         HoursBack = 50
+                                                                     }.WithAdminRequestInfo()
+                                                                      .ToJsv(),
+                                                                 Type = typeof(PostProcessHumanLoop).FullName
+                                                             }.WithAdminRequestInfo(),
+                                                             CronBuilder.Minutely(17),
+                                                             PostProcessHumanLoop.GetRecurringJobId(HumanLoopService.PublisherAccountCreatorCategoryPrefix));
+            }
         }
 
-        public void Configure(ServiceStackHost host, Container container)
-        { // Prod vs. dev firebase creds
-            var firebaseCredentials = RydrEnvironment.IsReleaseEnvironment || RydrEnvironment.CurrentEnvironment.EqualsOrdinalCi("Production")
-                                          ? GoogleCredential.FromJson(@"
+        Interlocked.Exchange(ref _inStartup, 0);
+    }
+
+    public void Configure(ServiceStackHost host, Container container)
+    { // Prod vs. dev firebase creds
+        var firebaseCredentials = RydrEnvironment.IsReleaseEnvironment || RydrEnvironment.CurrentEnvironment.EqualsOrdinalCi("Production")
+                                      ? GoogleCredential.FromJson(@"
 {
     ""type"": ""service_account"",
     ""project_id"": ""rydr-flutter"",
@@ -124,7 +121,7 @@ namespace Rydr.Api.Services.Helpers
     ""client_x509_cert_url"": ""https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-wpurb%40rydr-flutter.iam.gserviceaccount.com""
 }
 ")
-                                          : GoogleCredential.FromJson(@"
+                                      : GoogleCredential.FromJson(@"
 {
   ""type"": ""service_account"",
   ""project_id"": ""rydr-dev"",
@@ -139,94 +136,95 @@ namespace Rydr.Api.Services.Helpers
 }
 ");
 
-            // rydr-flutter firebase project (LIVE app)
-            FirebaseApp.Create(new AppOptions
-                               {
-                                   Credential = firebaseCredentials
-                               });
+        // rydr-flutter firebase project (LIVE app)
+        FirebaseApp.Create(new AppOptions
+                           {
+                               Credential = firebaseCredentials
+                           });
 
-            var apiConfig = new RydrApiConfiguration(host, container);
+        var apiConfig = new RydrApiConfiguration(host, container);
 
-            apiConfig.ApplyConfigs();
+        apiConfig.ApplyConfigs();
 
-            if (RydrEnvironment.GetAppSetting("Messaging.DisableAll", false))
-            {
-                var tmc = new TransientMessagingConfiguration();
+        if (RydrEnvironment.GetAppSetting("Messaging.DisableAll", false))
+        {
+            var tmc = new TransientMessagingConfiguration();
 
-                tmc.Apply(host, host.Container);
+            tmc.Apply(host, host.Container);
 
-                _mqHost = tmc.MqHost;
+            _mqHost = tmc.MqHost;
 
-                Log.Info("Message handling DISABLED on this service due to Messaging.DisableAll configuration setting being on.");
-            }
-            else
-            {
-                var lmc = new LiveMessagingConfiguration();
+            Log.Info("Message handling DISABLED on this service due to Messaging.DisableAll configuration setting being on.");
+        }
+        else
+        {
+            var lmc = new LiveMessagingConfiguration();
 
-                lmc.Apply(host, host.Container);
+            lmc.Apply(host, host.Container);
 
-                _mqHost = lmc.MqHost;
-            }
+            _mqHost = lmc.MqHost;
+        }
 
-            // Auth repos and schema
-            var userRepository = new RydrDynamoFirebaseAuthUserRepository(container.Resolve<IPocoDynamo>(),
-                                                                          container.Resolve<IUserService>(),
-                                                                          container.Resolve<IClientTokenAuthorizationService>());
+        // Auth repos and schema
+        var userRepository = new RydrDynamoFirebaseAuthUserRepository(container.Resolve<IPocoDynamo>(),
+                                                                      container.Resolve<IUserService>(),
+                                                                      container.Resolve<IClientTokenAuthorizationService>());
 
-            container.Register<IAuthRepository>(userRepository);
-            container.Register<IUserAuthRepository>(userRepository);
-            container.Register<IRydrUserAuthRepository>(userRepository);
+        container.Register<IAuthRepository>(userRepository);
+        container.Register<IUserAuthRepository>(userRepository);
+        container.Register<IRydrUserAuthRepository>(userRepository);
 
-            // Web Services and validators...
-            host.RegisterServicesInAssembly(typeof(MonitorService).Assembly);
-            host.Container.RegisterValidators(typeof(DateTimeAttributeValidator).Assembly);
+        // Web Services and validators...
+        host.RegisterServicesInAssembly(typeof(MonitorService).Assembly);
+        host.Container.RegisterValidators(typeof(DateTimeAttributeValidator).Assembly);
 
-            if (RydrEnvironment.IsDebugEnabled)
-            {
-                var hideExcludeTypes = RequestHelpers.AllowedAnonRequestTypes
-                                                     .Concat(RequestHelpers.RequestsThatSkipLogging)
-                                                     .Distinct()
-                                                     .ToArray();
+        if (RydrEnvironment.IsDebugEnabled)
+        {
+            var hideExcludeTypes = RequestHelpers.AllowedAnonRequestTypes
+                                                 .Concat(RequestHelpers.RequestsThatSkipLogging)
+                                                 .Distinct()
+                                                 .ToArray();
 
-                host.Plugins.Add(new RequestLogsFeature
-                                 {
-                                     EnableErrorTracking = true,
-                                     EnableSessionTracking = false,
-                                     EnableResponseTracking = RydrEnvironment.IsLocalEnvironment,
-                                     EnableRequestBodyTracking = true,
-                                     Capacity = 500,
-                                     RequestLogFilter = (r, e) =>
+            host.Plugins.Add(new RequestLogsFeature
+                             {
+                                 EnableErrorTracking = true,
+                                 EnableSessionTracking = false,
+                                 EnableResponseTracking = RydrEnvironment.IsLocalEnvironment,
+                                 EnableRequestBodyTracking = true,
+                                 Capacity = 500,
+                                 RequestLogFilter = (r, e) =>
+                                                    {
+                                                        e.Items = null;
+                                                        e.SessionId = null;
+
+                                                        if (e.Headers.IsNullOrEmptyRydr())
                                                         {
-                                                            e.Items = null;
-                                                            e.SessionId = null;
+                                                            return;
+                                                        }
 
-                                                            if (e.Headers.IsNullOrEmptyRydr())
-                                                            {
-                                                                return;
-                                                            }
+                                                        var keysToRemove = e.Headers
+                                                                            .Where(h => h.Key.EqualsOrdinalCi("Authorization") ||
+                                                                                        h.Key.StartsWithOrdinalCi("X-rydr") ||
+                                                                                        h.Key.StartsWithOrdinalCi("X-ss"))
+                                                                            .Select(h => h.Key)
+                                                                            .AsList();
 
-                                                            var keysToRemove = e.Headers
-                                                                                .Where(h => h.Key.EqualsOrdinalCi("Authorization") ||
-                                                                                            h.Key.StartsWithOrdinalCi("X-rydr") ||
-                                                                                            h.Key.StartsWithOrdinalCi("X-ss"))
-                                                                                .Select(h => h.Key)
-                                                                                .AsList();
+                                                        keysToRemove.Each(k => e.Headers.Remove(k));
+                                                    },
+                                 ExcludeRequestDtoTypes = hideExcludeTypes,
+                                 HideRequestBodyForRequestDtoTypes = hideExcludeTypes,
+                                 RequiredRoles = new[]
+                                                 {
+                                                     "Admin"
+                                                 }
+                             });
+        }
 
-                                                            keysToRemove.Each(k => e.Headers.Remove(k));
-                                                        },
-                                     ExcludeRequestDtoTypes = hideExcludeTypes,
-                                     HideRequestBodyForRequestDtoTypes = hideExcludeTypes,
-                                     RequiredRoles = new[]
-                                                     {
-                                                         "Admin"
-                                                     }
-                                 });
-            }
-
-            // Ensure our initial admin user is setup
+        // Ensure our initial admin user is setup
 #if LOCALDEBUG
-            // ReSharper disable once ConvertToConstant.Local
-            var apiKey = "coNvop4sZWzUISupyNDRNiq274Xc_nXxLCipYEA3ThK00e5E9HbTK4kTjgc0K5ABxuQ";
+
+        // ReSharper disable once ConvertToConstant.Local
+        var apiKey = "coNvop4sZWzUISupyNDRNiq274Xc_nXxLCipYEA3ThK00e5E9HbTK4kTjgc0K5ABxuQ";
 #else
             var secretService = container.Resolve<ISecretService>();
 
@@ -234,170 +232,169 @@ namespace Rydr.Api.Services.Helpers
             var apiKey = secretService.GetSecretStringAsync($"RydrApi.AdminPassword.{RydrEnvironment.CurrentEnvironment}").GetAwaiter().GetResult();
 #endif
 
-            RydrEnvironment.SetAdminKey(apiKey);
-            host.Config.AdminAuthSecret = apiKey;
+        RydrEnvironment.SetAdminKey(apiKey);
+        host.Config.AdminAuthSecret = apiKey;
 
-            var existingAdminUser = userRepository.GetDynUserByUserNameAsync("rydr.admin.dummyacct@getrydr.com").GetAwaiter().GetResult();
+        var existingAdminUser = userRepository.GetDynUserByUserNameAsync("rydr.admin.dummyacct@getrydr.com").GetAwaiter().GetResult();
 
-            if (existingAdminUser != null)
-            {
-                return;
-            }
-
-            var dynUser = userRepository.CreateUserAuthAsync(new DynUser
-                                                             {
-                                                                 FirstName = "Rydr",
-                                                                 LastName = "Admin",
-                                                                 FullName = "Rydr Admin",
-                                                                 Email = "rydr.admin.dummyacct@getrydr.com",
-                                                                 UserName = "rydr.admin.dummyacct@getrydr.com",
-                                                                 UserType = UserType.Admin
-                                                             }).GetAwaiter().GetResult();
-
-            userRepository.StoreAll(new ApiKey
-                                    {
-                                        Id = apiKey,
-                                        UserAuthId = dynUser.UserId.ToStringInvariant()
-                                    }.AsEnumerable());
+        if (existingAdminUser != null)
+        {
+            return;
         }
 
-        public int ShutdownWaitTimeout => RydrEnvironment.GetAppSetting("Environment.ShutdownWaitSeconds", 600);
+        var dynUser = userRepository.CreateUserAuthAsync(new DynUser
+                                                         {
+                                                             FirstName = "Rydr",
+                                                             LastName = "Admin",
+                                                             FullName = "Rydr Admin",
+                                                             Email = "rydr.admin.dummyacct@getrydr.com",
+                                                             UserName = "rydr.admin.dummyacct@getrydr.com",
+                                                             UserType = UserType.Admin
+                                                         }).GetAwaiter().GetResult();
 
-        public void Shutdown(Container container, Action stopCallback = null)
-        {
-            if (Interlocked.Exchange(ref _inShutdown, 1) > 0)
-            {
-                return;
-            }
-
-            BaseApiService.InShutdown = true;
-            LocalAsyncTaskExecuter.DefaultTaskExecuter.InShutdown = true;
-
-            // Stop the MQ host early so it does not keep trying to process requests while waiting for shutdown
-            ShutdownMqHost(container);
-
-            // Stop the Hangfire JobServer...
-            container.Resolve<BackgroundJobServer>().Dispose();
-
-            var counterService = container.TryResolve<ICounterAndListService>();
-
-            if (counterService != null)
-            {
-                var waitForSeconds = ShutdownWaitTimeout;
-                var startedWaitAt = DateTimeHelper.UtcNowTs;
-
-                Log.InfoFormat("Shutdown requested, waiting for outstanding requests to complete for up to [{0}] seconds", waitForSeconds);
-
-                do
-                {
-                    // Wait for existing things to finish up if feasible
-                    var currentApiThreadCount = counterService.GetCounter(Stats.AllApiOpenRequests);
-
-                    if (currentApiThreadCount <= 0 && LocalAsyncTaskExecuter.DefaultTaskExecuter.Count <= 0)
-                    {
-                        break;
-                    }
-
-                    Thread.Sleep(750);
-                } while (DateTimeHelper.UtcNowTs - startedWaitAt <= waitForSeconds);
-            }
-
-            ShutdownAppHost(stopCallback);
-        }
-
-        private void ShutdownAppHost(Action stopCallback)
-        {
-            try
-            {
-                Log.Info("Shutdown of AppHost starting");
-
-                stopCallback?.Invoke();
-
-                Log.Info("Shutdown of AppHost complete");
-            }
-            catch(Exception ex)
-            {
-                Log.Exception(ex, "Exception trying to Shutdown the AppHost.");
-            }
-            finally
-            {
-                Try.Exec(() =>
-                         {
-                             LogManager.Flush();
-                             LogManager.Shutdown();
-                         });
-            }
-        }
-
-        private void ShutdownMqHost(Container container) => MqHostHelper.Instance.ShutdownHosts(container.TryResolve<IMessageService>(),
-                                                                                                container.TryResolve<IServerEvents>());
-
-        public void Init(Action initCallback = null)
-        {
-            var useAwsLogs = !RydrEnvironment.IsLocalEnvironment && RydrEnvironment.GetAppSetting("Logging.UseAwsTarget", false);
-
-            // Configure NLog to either throw exceptions (if local), or add the AWS log target in non-debug...
-            if (RydrEnvironment.IsLocalEnvironment)
-            {
-                LogManager.ThrowExceptions = true;
-            }
-
-            if (RydrEnvironment.GetAppSetting("Environment.Containerized", false))
-            {
-                // Disable all the loggers except console
-                var loggersToDisable = LogManager.Configuration.LoggingRules
-                                                 .Where(r => r.Targets != null &&
-                                                             r.Targets.Count > 0 &&
-                                                             !r.Targets.Any(t => t.Name.Contains("console", StringComparison.OrdinalIgnoreCase)))
-                                                 .AsList();
-
-                Guard.Against(!loggersToDisable.All(l => LogManager.Configuration.LoggingRules.Remove(l)), "Could not remove logger rules for containerized operation");
-            }
-
-            if (useAwsLogs)
-            { // Add the AWS log target
-                var awsTarget = new AWSTarget
+        userRepository.StoreAll(new ApiKey
                                 {
-                                    Credentials = new BasicAWSCredentials(RydrEnvironment.GetAppSetting("AWSAccessKey"),
-                                                                          RydrEnvironment.GetAppSetting("AWSSecretKey")),
-                                    LogGroup = "Rydr.Api",
-                                    Region = "us-west-2",
-                                    Name = "aws",
-                                    LibraryLogFileName = "./logs/awsLoggerErrorLog.txt",
-                                    LogStreamNameSuffix = string.Concat(RydrEnvironment.CurrentEnvironment, " - ", Environment.MachineName)
-                                };
+                                    Id = apiKey,
+                                    UserAuthId = dynUser.UserId.ToStringInvariant()
+                                }.AsEnumerable());
+    }
 
-                LogManager.Configuration.AddTarget(awsTarget);
+    public int ShutdownWaitTimeout => RydrEnvironment.GetAppSetting("Environment.ShutdownWaitSeconds", 600);
 
-                var ruleToAddAwsTo = LogManager.Configuration.LoggingRules.Single(r => r.LoggerNamePattern.EqualsOrdinalCi("*") &&
-                                                                                       r.Targets.Count(t => t.Name.EqualsOrdinalCi("console")) == 1);
+    public void Shutdown(Container container, Action stopCallback = null)
+    {
+        if (Interlocked.Exchange(ref _inShutdown, 1) > 0)
+        {
+            return;
+        }
 
-                ruleToAddAwsTo.Targets.Add(awsTarget);
-            }
+        BaseApiService.InShutdown = true;
+        LocalAsyncTaskExecuter.DefaultTaskExecuter.InShutdown = true;
 
-            LogManager.Configuration.Reload();
+        // Stop the MQ host early so it does not keep trying to process requests while waiting for shutdown
+        ShutdownMqHost(container);
 
-            ServiceStack.Logging.LogManager.LogFactory = new ImplicitContextLogFactory(new NLogFactory());
+        // Stop the Hangfire JobServer...
+        container.Resolve<BackgroundJobServer>().Dispose();
 
-            Log = ServiceStack.Logging.LogManager.GetLogger(GetType());
+        var counterService = container.TryResolve<ICounterAndListService>();
 
-            try
+        if (counterService != null)
+        {
+            var waitForSeconds = ShutdownWaitTimeout;
+            var startedWaitAt = DateTimeHelper.UtcNowTs;
+
+            Log.InfoFormat("Shutdown requested, waiting for outstanding requests to complete for up to [{0}] seconds", waitForSeconds);
+
+            do
             {
-                Log.Info("AppHost Starting");
+                // Wait for existing things to finish up if feasible
+                var currentApiThreadCount = counterService.GetCounter(Stats.AllApiOpenRequests);
 
-                initCallback?.Invoke();
-            }
-            catch(Exception ex)
-            {
-                if (_inShutdown > 0)
+                if (currentApiThreadCount <= 0 && LocalAsyncTaskExecuter.DefaultTaskExecuter.Count <= 0)
                 {
-                    return;
+                    break;
                 }
 
-                Log.Exception(ex, "Exception in AppHost Init");
+                Thread.Sleep(750);
+            } while (DateTimeHelper.UtcNowTs - startedWaitAt <= waitForSeconds);
+        }
 
-                throw;
+        ShutdownAppHost(stopCallback);
+    }
+
+    private void ShutdownAppHost(Action stopCallback)
+    {
+        try
+        {
+            Log.Info("Shutdown of AppHost starting");
+
+            stopCallback?.Invoke();
+
+            Log.Info("Shutdown of AppHost complete");
+        }
+        catch(Exception ex)
+        {
+            Log.Exception(ex, "Exception trying to Shutdown the AppHost.");
+        }
+        finally
+        {
+            Try.Exec(() =>
+                     {
+                         LogManager.Flush();
+                         LogManager.Shutdown();
+                     });
+        }
+    }
+
+    private void ShutdownMqHost(Container container) => MqHostHelper.Instance.ShutdownHosts(container.TryResolve<IMessageService>(),
+                                                                                            container.TryResolve<IServerEvents>());
+
+    public void Init(Action initCallback = null)
+    {
+        var useAwsLogs = !RydrEnvironment.IsLocalEnvironment && RydrEnvironment.GetAppSetting("Logging.UseAwsTarget", false);
+
+        // Configure NLog to either throw exceptions (if local), or add the AWS log target in non-debug...
+        if (RydrEnvironment.IsLocalEnvironment)
+        {
+            LogManager.ThrowExceptions = true;
+        }
+
+        if (RydrEnvironment.GetAppSetting("Environment.Containerized", false))
+        {
+            // Disable all the loggers except console
+            var loggersToDisable = LogManager.Configuration.LoggingRules
+                                             .Where(r => r.Targets != null &&
+                                                         r.Targets.Count > 0 &&
+                                                         !r.Targets.Any(t => t.Name.Contains("console", StringComparison.OrdinalIgnoreCase)))
+                                             .AsList();
+
+            Guard.Against(!loggersToDisable.All(l => LogManager.Configuration.LoggingRules.Remove(l)), "Could not remove logger rules for containerized operation");
+        }
+
+        if (useAwsLogs)
+        { // Add the AWS log target
+            var awsTarget = new AWSTarget
+                            {
+                                Credentials = new BasicAWSCredentials(RydrEnvironment.GetAppSetting("AWSAccessKey"),
+                                                                      RydrEnvironment.GetAppSetting("AWSSecretKey")),
+                                LogGroup = "Rydr.Api",
+                                Region = "us-west-2",
+                                Name = "aws",
+                                LibraryLogFileName = "./logs/awsLoggerErrorLog.txt",
+                                LogStreamNameSuffix = string.Concat(RydrEnvironment.CurrentEnvironment, " - ", Environment.MachineName)
+                            };
+
+            LogManager.Configuration.AddTarget(awsTarget);
+
+            var ruleToAddAwsTo = LogManager.Configuration.LoggingRules.Single(r => r.LoggerNamePattern.EqualsOrdinalCi("*") &&
+                                                                                   r.Targets.Count(t => t.Name.EqualsOrdinalCi("console")) == 1);
+
+            ruleToAddAwsTo.Targets.Add(awsTarget);
+        }
+
+        LogManager.Configuration.Reload();
+
+        ServiceStack.Logging.LogManager.LogFactory = new ImplicitContextLogFactory(new NLogFactory());
+
+        Log = ServiceStack.Logging.LogManager.GetLogger(GetType());
+
+        try
+        {
+            Log.Info("AppHost Starting");
+
+            initCallback?.Invoke();
+        }
+        catch(Exception ex)
+        {
+            if (_inShutdown > 0)
+            {
+                return;
             }
+
+            Log.Exception(ex, "Exception in AppHost Init");
+
+            throw;
         }
     }
 }

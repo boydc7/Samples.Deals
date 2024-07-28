@@ -1,96 +1,93 @@
-using System;
-using System.IO;
 using Amazon.S3.Model;
 using Rydr.Api.Core.Extensions;
 using Rydr.Api.Core.Services.Internal;
 
-namespace Rydr.Api.Core.Models.Supporting
+namespace Rydr.Api.Core.Models.Supporting;
+
+public class S3BucketPrefixKey
 {
-    public class S3BucketPrefixKey
+    public S3BucketPrefixKey(string bucketName, S3Object s3Object) : this(Path.Combine(bucketName, s3Object.Key), false, s3Object.Size) { }
+
+    public S3BucketPrefixKey(FileMetaData meta) : this(meta.FullName) { }
+
+    public S3BucketPrefixKey(string fullPathAndFileName, bool terminateWithPathDelimiter = false, long size = 0)
     {
-        public S3BucketPrefixKey(string bucketName, S3Object s3Object) : this(Path.Combine(bucketName, s3Object.Key), false, s3Object.Size) { }
+        Guard.Against(string.IsNullOrEmpty(fullPathAndFileName), "fullPathAndFileName must not be empty.");
 
-        public S3BucketPrefixKey(FileMetaData meta) : this(meta.FullName) { }
+        Key = string.Empty;
+        FileName = string.Empty;
+        Prefix = string.Empty;
+        Size = size;
 
-        public S3BucketPrefixKey(string fullPathAndFileName, bool terminateWithPathDelimiter = false, long size = 0)
+        fullPathAndFileName = fullPathAndFileName.Replace("\\", "/");
+
+        if (terminateWithPathDelimiter && !fullPathAndFileName.EndsWith("/"))
         {
-            Guard.Against(string.IsNullOrEmpty(fullPathAndFileName), "fullPathAndFileName must not be empty.");
+            fullPathAndFileName = string.Concat(fullPathAndFileName, "/");
+        }
 
-            Key = string.Empty;
-            FileName = string.Empty;
-            Prefix = string.Empty;
-            Size = size;
+        var split = fullPathAndFileName.Split(new[]
+                                              {
+                                                  '/'
+                                              }, StringSplitOptions.RemoveEmptyEntries);
 
-            fullPathAndFileName = fullPathAndFileName.Replace("\\", "/");
+        BucketName = split[0];
 
-            if (terminateWithPathDelimiter && !fullPathAndFileName.EndsWith("/"))
+        if (split.Length > 1)
+        {
+            Key = string.Join("/", split, 1, split.Length - 1);
+
+            if (fullPathAndFileName.EndsWith("/"))
             {
-                fullPathAndFileName = string.Concat(fullPathAndFileName, "/");
-            }
-
-            var split = fullPathAndFileName.Split(new[]
-                                                  {
-                                                      '/'
-                                                  }, StringSplitOptions.RemoveEmptyEntries);
-
-            BucketName = split[0];
-
-            if (split.Length > 1)
-            {
-                Key = string.Join("/", split, 1, split.Length - 1);
-
-                if (fullPathAndFileName.EndsWith("/"))
-                {
-                    Key = Key + "/";
-                    Prefix = Key;
-                }
-                else
-                {
-                    FileName = split[split.GetUpperBound(0)];
-
-                    if (split.Length > 2)
-                    {
-                        Prefix = string.Join("/", split, 1, split.Length - 2) + "/";
-                    }
-                }
+                Key = Key + "/";
+                Prefix = Key;
             }
             else
             {
-                IsBucketObject = true;
+                FileName = split[split.GetUpperBound(0)];
+
+                if (split.Length > 2)
+                {
+                    Prefix = string.Join("/", split, 1, split.Length - 2) + "/";
+                }
             }
         }
-
-        public string BucketName { get; }
-        public string Prefix { get; }
-        public string Key { get; }
-        public string FileName { get; }
-        public long Size { get; }
-
-        public bool IsBucketObject { get; }
-
-        public bool HasPrefix => !string.IsNullOrEmpty(Prefix);
-
-        public string FullName => string.Concat("/", ToString());
-
-        public bool Equals(S3BucketPrefixKey other) => other != null && ToString().EqualsOrdinalCi(other.ToString());
-
-        public override bool Equals(object obj)
+        else
         {
-            if (obj == null)
-            {
-                return false;
-            }
+            IsBucketObject = true;
+        }
+    }
 
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
+    public string BucketName { get; }
+    public string Prefix { get; }
+    public string Key { get; }
+    public string FileName { get; }
+    public long Size { get; }
 
-            return obj is S3BucketPrefixKey bpkObj && Equals(bpkObj);
+    public bool IsBucketObject { get; }
+
+    public bool HasPrefix => !string.IsNullOrEmpty(Prefix);
+
+    public string FullName => string.Concat("/", ToString());
+
+    public bool Equals(S3BucketPrefixKey other) => other != null && ToString().EqualsOrdinalCi(other.ToString());
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null)
+        {
+            return false;
         }
 
-        public override string ToString() => string.Concat(BucketName, "/", Key);
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
 
-        public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(ToString());
+        return obj is S3BucketPrefixKey bpkObj && Equals(bpkObj);
     }
+
+    public override string ToString() => string.Concat(BucketName, "/", Key);
+
+    public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(ToString());
 }

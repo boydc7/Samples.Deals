@@ -1,9 +1,8 @@
-namespace Rydr.Api.Dto.Enums
+namespace Rydr.Api.Dto.Enums;
+
+public enum AccessIntent
 {
-    public enum AccessIntent
-    {
-        Unspecified,
-        ReadOnly,
-        Write
-    }
+    Unspecified,
+    ReadOnly,
+    Write
 }

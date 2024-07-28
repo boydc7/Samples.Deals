@@ -1,11 +1,10 @@
-namespace Rydr.Api.Core.Enums
+namespace Rydr.Api.Core.Enums;
+
+public enum MqProcessType
 {
-    public enum MqProcessType
-    {
-        Unspecified,
-        Ignore,
-        Archive,
-        Alert,
-        Reprocess
-    }
+    Unspecified,
+    Ignore,
+    Archive,
+    Alert,
+    Reprocess
 }

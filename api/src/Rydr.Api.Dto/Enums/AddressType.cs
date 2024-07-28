@@ -1,14 +1,13 @@
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Dto.Enums
+namespace Rydr.Api.Dto.Enums;
+
+[EnumAsInt]
+public enum AddressType
 {
-    [EnumAsInt]
-    public enum AddressType
-    {
-        Unspecified,
-        Business,
-        Work,
-        Home,
-        Other
-    }
+    Unspecified,
+    Business,
+    Work,
+    Home,
+    Other
 }

@@ -1,91 +1,87 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Funq;
 using Rydr.Api.Core.Interfaces.Services;
 using Rydr.Api.Dto.Enums;
 using Rydr.Api.Dto.Interfaces;
 using Rydr.Api.Dto.Shared;
 
-namespace Rydr.Api.Core.Services
+namespace Rydr.Api.Core.Services;
+
+public class DefaultRecordTypeRecordService : IRecordTypeRecordService, IGetRecordServiceFactory
 {
-    public class DefaultRecordTypeRecordService : IRecordTypeRecordService, IGetRecordServiceFactory
+    private readonly Container _resolver;
+
+    public DefaultRecordTypeRecordService(Container resolver)
     {
-        private readonly Container _resolver;
+        _resolver = resolver;
+    }
 
-        public DefaultRecordTypeRecordService(Container resolver)
+    public IGetRecordsService Resolve(RecordType recordType)
+    {
+        var getRecordsService = _resolver.TryResolveNamed<IGetRecordsService>(recordType.ToString());
+
+        if (getRecordsService == null)
         {
-            _resolver = resolver;
+            throw new ArgumentOutOfRangeException(nameof(recordType), $"No RecordService could be resolved for EntityType [{recordType.ToString()}]");
         }
 
-        public IGetRecordsService Resolve(RecordType recordType)
+        return getRecordsService;
+    }
+
+    public async Task ValidateAsync(RecordType recordType, long recordId, IHasUserAuthorizationInfo request = null)
+    {
+        var recordService = Resolve(recordType);
+
+        await recordService.ValidateAsync(recordId, request);
+    }
+
+    public async Task SaveRydrRecordsAsync(RecordType recordType, ICollection<long> ids)
+    {
+        var recordService = Resolve(recordType);
+
+        if (!(recordService is ISaveRydrRecordsService saveRydrRecordsService))
         {
-            var getRecordsService = _resolver.TryResolveNamed<IGetRecordsService>(recordType.ToString());
-
-            if (getRecordsService == null)
-            {
-                throw new ArgumentOutOfRangeException(nameof(recordType), $"No RecordService could be resolved for EntityType [{recordType.ToString()}]");
-            }
-
-            return getRecordsService;
+            return;
         }
 
-        public async Task ValidateAsync(RecordType recordType, long recordId, IHasUserAuthorizationInfo request = null)
-        {
-            var recordService = Resolve(recordType);
+        await saveRydrRecordsService.SaveRecordsAsync(ids);
+    }
 
-            await recordService.ValidateAsync(recordId, request);
+    public async Task SaveRydrRecordsAsync(RecordType recordType, ICollection<DynamoItemIdEdge> compositeRecordIds)
+    {
+        var recordService = Resolve(recordType);
+
+        if (!(recordService is ISaveRydrRecordsService saveRydrRecordsService))
+        {
+            return;
         }
 
-        public async Task SaveRydrRecordsAsync(RecordType recordType, ICollection<long> ids)
-        {
-            var recordService = Resolve(recordType);
+        await saveRydrRecordsService.SaveRecordsAsync(compositeRecordIds);
+    }
 
-            if (!(recordService is ISaveRydrRecordsService saveRydrRecordsService))
-            {
-                return;
-            }
+    public async Task<T> GetRecordAsync<T>(RecordType recordType, long recordId, IHasUserAuthorizationInfo request = null, bool isInternal = false)
+        where T : class, ICanBeRecordLookup
+    {
+        var recordService = Resolve(recordType);
 
-            await saveRydrRecordsService.SaveRecordsAsync(ids);
-        }
+        var result = await recordService.GetRecordAsAsync<T>(recordId, request, isInternal);
 
-        public async Task SaveRydrRecordsAsync(RecordType recordType, ICollection<DynamoItemIdEdge> compositeRecordIds)
-        {
-            var recordService = Resolve(recordType);
+        return result;
+    }
 
-            if (!(recordService is ISaveRydrRecordsService saveRydrRecordsService))
-            {
-                return;
-            }
+    public IAsyncEnumerable<T> GetRecordsAsync<T>(RecordType recordType, IEnumerable<long> recordIds,
+                                                  IHasUserAuthorizationInfo request = null, bool isInternal = false)
+        where T : class, ICanBeRecordLookup
+    {
+        var recordService = Resolve(recordType);
 
-            await saveRydrRecordsService.SaveRecordsAsync(compositeRecordIds);
-        }
+        return recordService.GetRecordsAsAsync<T>(recordIds, request, isInternal);
+    }
 
-        public async Task<T> GetRecordAsync<T>(RecordType recordType, long recordId, IHasUserAuthorizationInfo request = null, bool isInternal = false)
-            where T : class, ICanBeRecordLookup
-        {
-            var recordService = Resolve(recordType);
+    public IAsyncEnumerable<T> GetRecords<T>(RecordType recordType, IEnumerable<DynamoItemIdEdge> compositeRecordIds)
+        where T : class, ICanBeRecordLookup
+    {
+        var recordService = Resolve(recordType);
 
-            var result = await recordService.GetRecordAsAsync<T>(recordId, request, isInternal);
-
-            return result;
-        }
-
-        public IAsyncEnumerable<T> GetRecordsAsync<T>(RecordType recordType, IEnumerable<long> recordIds,
-                                                      IHasUserAuthorizationInfo request = null, bool isInternal = false)
-            where T : class, ICanBeRecordLookup
-        {
-            var recordService = Resolve(recordType);
-
-            return recordService.GetRecordsAsAsync<T>(recordIds, request, isInternal);
-        }
-
-        public IAsyncEnumerable<T> GetRecords<T>(RecordType recordType, IEnumerable<DynamoItemIdEdge> compositeRecordIds)
-            where T : class, ICanBeRecordLookup
-        {
-            var recordService = Resolve(recordType);
-
-            return recordService.GetRecordsAsAsync<T>(compositeRecordIds);
-        }
+        return recordService.GetRecordsAsAsync<T>(compositeRecordIds);
     }
 }

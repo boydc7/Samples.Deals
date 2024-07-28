@@ -1,77 +1,75 @@
-using System;
 using System.Text;
 using ServiceStack.Caching;
 using ServiceStack.Text;
 
 #pragma warning disable 162
 
-namespace Rydr.FbSdk.Configuration
+namespace Rydr.FbSdk.Configuration;
+
+public static class FacebookSdkConfig
 {
-    public static class FacebookSdkConfig
+    private static readonly object _lockObject = new();
+    private static bool _configured;
+
+    public static Func<ICacheClient> CacheClientFactory { get; set; }
+    public static bool ClientPoolingDisabled { get; set; }
+    public static bool ETagDisabled { get; set; }
+    public static string DefaultApiVersion { get; set; }
+    public static string StaticFbSystemToken { get; set; }
+
+    private static bool _useLoggedClient;
+
+    public static bool UseLoggedClient
     {
-        private static readonly object _lockObject = new object();
-        private static bool _configured;
-
-        public static Func<ICacheClient> CacheClientFactory { get; set; }
-        public static bool ClientPoolingDisabled { get; set; }
-        public static bool ETagDisabled { get; set; }
-        public static string DefaultApiVersion { get; set; }
-        public static string StaticFbSystemToken { get; set; }
-
-        private static bool _useLoggedClient;
-
-        public static bool UseLoggedClient
+        get
         {
-            get
-            {
 #if DEBUG || LOCAL
-                return true;
+            return true;
 #endif
 
-                return _useLoggedClient;
-            }
-            set => _useLoggedClient = value;
+            return _useLoggedClient;
+        }
+        set => _useLoggedClient = value;
+    }
+
+    public static Func<(string appId, string appSecret, string accessToken, string apiVersion), IFacebookClient> ClientFactory { get; set; } = null;
+    public static Func<(string appId, string appSecret, string accessToken), IInstagramBasicClient> InstagramBasicClientFactory { get; set; } = null;
+
+    public static void Configure()
+    {
+        if (_configured)
+        {
+            return;
         }
 
-        public static Func<(string appId, string appSecret, string accessToken, string apiVersion), IFacebookClient> ClientFactory { get; set; } = null;
-        public static Func<(string appId, string appSecret, string accessToken), IInstagramBasicClient> InstagramBasicClientFactory { get; set; } = null;
-
-        public static void Configure()
+        try
         {
-            if (_configured)
+            lock(_lockObject)
             {
-                return;
-            }
-
-            try
-            {
-                lock(_lockObject)
+                if (_configured)
                 {
-                    if (_configured)
-                    {
-                        return;
-                    }
-
-                    _configured = true;
+                    return;
                 }
 
-                JsConfig.TextCase = TextCase.CamelCase;
-                JsConfig.DateHandler = DateHandler.ISO8601;
-                JsConfig.AssumeUtc = true;
-
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                _configured = true;
             }
-            catch(Exception) when(ResetConfigured())
-            { // Unreachable code
-                throw;
-            }
-        }
 
-        private static bool ResetConfigured()
-        {
-            _configured = false;
+            JsConfig.TextCase = TextCase.CamelCase;
+            JsConfig.DateHandler = DateHandler.ISO8601;
+            JsConfig.AssumeUtc = true;
 
-            return false;
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
+        catch(Exception) when(ResetConfigured())
+        { // Unreachable code
+            throw;
+        }
+    }
+
+    private static bool ResetConfigured()
+    {
+        _configured = false;
+
+        return false;
     }
 }

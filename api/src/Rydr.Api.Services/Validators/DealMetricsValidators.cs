@@ -6,62 +6,61 @@ using Rydr.Api.Dto.Enums;
 using Rydr.Api.Services.Helpers;
 using ServiceStack.FluentValidation;
 
-namespace Rydr.Api.Services.Validators
+namespace Rydr.Api.Services.Validators;
+
+public class PostDealMetricValidator : BaseRydrValidator<PostDealMetric>
 {
-    public class PostDealMetricValidator : BaseRydrValidator<PostDealMetric>
+    public PostDealMetricValidator()
     {
-        public PostDealMetricValidator()
-        {
-            Include(new IsFromValidRequestWorkspaceValidator<PostDealMetric>());
+        Include(new IsFromValidRequestWorkspaceValidator<PostDealMetric>());
 
-            RuleFor(e => e.DealId)
-                .GreaterThan(0)
-                .WithErrorCode(ErrorCodes.MustBeValid);
+        RuleFor(e => e.DealId)
+            .GreaterThan(0)
+            .WithErrorCode(ErrorCodes.MustBeValid);
 
-            RuleFor(e => e.MetricType)
-                .NotEqual(DealTrackMetricType.Unknown)
-                .WithErrorCode(ErrorCodes.MustBeValid);
+        RuleFor(e => e.MetricType)
+            .NotEqual(DealTrackMetricType.Unknown)
+            .WithErrorCode(ErrorCodes.MustBeValid);
 
-            Include(new IsValidPublisherAccountIdOrRequestPublisherIdValidator<PostDealMetric>());
+        Include(new IsValidPublisherAccountIdOrRequestPublisherIdValidator<PostDealMetric>());
 
-            // NOTE: Purposely not validating auth to the deal here...metric tracking...
-            // RuleFor(e => e.ToDynItemValidationSource(e.DealId.ToEdgeId(), DynItemType.Deal, ApplyToBehavior.MustExistNotDeleted))
-            //     .IsValidDynamoItem()
-            //     .When(e => e.DealId > 0);
-        }
+        // NOTE: Purposely not validating auth to the deal here...metric tracking...
+        // RuleFor(e => e.ToDynItemValidationSource(e.DealId.ToEdgeId(), DynItemType.Deal, ApplyToBehavior.MustExistNotDeleted))
+        //     .IsValidDynamoItem()
+        //     .When(e => e.DealId > 0);
     }
+}
 
-    public class GetDelinquentDealRequestsValidator : BaseRydrValidator<GetDelinquentDealRequests>
+public class GetDelinquentDealRequestsValidator : BaseRydrValidator<GetDelinquentDealRequests>
+{
+    public GetDelinquentDealRequestsValidator()
     {
-        public GetDelinquentDealRequestsValidator()
-        {
-            Include(new IsValidPublisherIdentifierValidator<GetDelinquentDealRequests>());
-        }
+        Include(new IsValidPublisherIdentifierValidator<GetDelinquentDealRequests>());
     }
+}
 
-    public class GetDealCompletionMediaMetricsValidator : BaseRydrValidator<GetDealCompletionMediaMetrics>
+public class GetDealCompletionMediaMetricsValidator : BaseRydrValidator<GetDealCompletionMediaMetrics>
+{
+    public GetDealCompletionMediaMetricsValidator()
     {
-        public GetDealCompletionMediaMetricsValidator()
-        {
-            RuleFor(e => e.ToDynItemValidationSource<DynDeal>(e.DealId.ToEdgeId(), DynItemType.Deal, ApplyToBehavior.MustExistCanBeDeleted))
-                .IsValidDynamoItem()
-                .When(e => e.DealId > 0);
+        RuleFor(e => e.ToDynItemValidationSource<DynDeal>(e.DealId.ToEdgeId(), DynItemType.Deal, ApplyToBehavior.MustExistCanBeDeleted))
+            .IsValidDynamoItem()
+            .When(e => e.DealId > 0);
 
-            Include(new IsValidPublisherAccountIdOrRequestPublisherIdValidator<GetDealCompletionMediaMetrics>());
+        Include(new IsValidPublisherAccountIdOrRequestPublisherIdValidator<GetDealCompletionMediaMetrics>());
 
-            // Can only specify a publisher account that is not the authenticated account if the user is an admin/in-process basically
-            RuleFor(e => e.PublisherAccountId)
-                .Equal(e => e.RequestPublisherAccountId)
-                .When(e => e.PublisherAccountId > 0 && !e.IsSystemRequest)
-                .WithErrorCode(ErrorCodes.MustBeAuthorized);
+        // Can only specify a publisher account that is not the authenticated account if the user is an admin/in-process basically
+        RuleFor(e => e.PublisherAccountId)
+            .Equal(e => e.RequestPublisherAccountId)
+            .When(e => e.PublisherAccountId > 0 && !e.IsSystemRequest)
+            .WithErrorCode(ErrorCodes.MustBeAuthorized);
 
-            RuleFor(e => e.CompletedOnStart.Value)
-                .IsValidDateTime("CompletedOnStart")
-                .When(e => e.CompletedOnStart.HasValue);
+        RuleFor(e => e.CompletedOnStart.Value)
+            .IsValidDateTime("CompletedOnStart")
+            .When(e => e.CompletedOnStart.HasValue);
 
-            RuleFor(e => e.CompletedOnEnd.Value)
-                .IsValidDateTime("CompletedOnEnd")
-                .When(e => e.CompletedOnEnd.HasValue);
-        }
+        RuleFor(e => e.CompletedOnEnd.Value)
+            .IsValidDateTime("CompletedOnEnd")
+            .When(e => e.CompletedOnEnd.HasValue);
     }
 }

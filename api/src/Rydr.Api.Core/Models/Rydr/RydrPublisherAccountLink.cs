@@ -1,10 +1,9 @@
-using System;
 using ServiceStack.DataAnnotations;
 using ServiceStack.Model;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE PublisherAccountLinks;
 CREATE TABLE PublisherAccountLinks
 (
@@ -20,28 +19,27 @@ CONSTRAINT CHK_PublisherAccountLinks_ToPublisherAccountId CHECK ( ToPublisherAcc
 CREATE UNIQUE INDEX IDX_PublisherAccountLinks__ToPubId_FromPubId_WksId ON PublisherAccountLinks (ToPublisherAccountId, FromPublisherAccountId, WorkspaceId);
 CREATE UNIQUE INDEX IDX_PublisherAccountLinks__Id ON PublisherAccountLinks (Id);
 ")]
-    [Alias("PublisherAccountLinks")]
-    public class RydrPublisherAccountLink : IHasStringId
+[Alias("PublisherAccountLinks")]
+public class RydrPublisherAccountLink : IHasStringId
+{
+    [Required]
+    [PrimaryKey]
+    public string Id
     {
-        [Required]
-        [PrimaryKey]
-        public string Id
+        get => string.Concat(WorkspaceId, "_", FromPublisherAccountId, "_", ToPublisherAccountId);
+
+        // ReSharper disable once ValueParameterNotUsed
+        set
         {
-            get => string.Concat(WorkspaceId, "_", FromPublisherAccountId, "_", ToPublisherAccountId);
-
-            // ReSharper disable once ValueParameterNotUsed
-            set
-            {
-                // Ignore
-            }
+            // Ignore
         }
-
-        public long WorkspaceId { get; set; }
-
-        public long FromPublisherAccountId { get; set; }
-
-        public long ToPublisherAccountId { get; set; }
-
-        public DateTime? DeletedOn { get; set; }
     }
+
+    public long WorkspaceId { get; set; }
+
+    public long FromPublisherAccountId { get; set; }
+
+    public long ToPublisherAccountId { get; set; }
+
+    public DateTime? DeletedOn { get; set; }
 }

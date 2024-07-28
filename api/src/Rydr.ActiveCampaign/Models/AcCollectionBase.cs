@@ -1,10 +1,7 @@
-using System.Collections.Generic;
+namespace Rydr.ActiveCampaign.Models;
 
-namespace Rydr.ActiveCampaign.Models
+public abstract class AcCollectionBase<T>
 {
-    public abstract class AcCollectionBase<T>
-    {
-        public abstract IReadOnlyList<T> Data { get; }
-        public AcMeta Meta { get; set; }
-    }
+    public abstract IReadOnlyList<T> Data { get; }
+    public AcMeta Meta { get; set; }
 }

@@ -1,9 +1,8 @@
 using Rydr.Api.Dto.Shared;
 
-namespace Rydr.Api.Dto.Interfaces
+namespace Rydr.Api.Dto.Interfaces;
+
+public interface IHaveAddress
 {
-    public interface IHaveAddress
-    {
-        Address Address { get; }
-    }
+    Address Address { get; }
 }

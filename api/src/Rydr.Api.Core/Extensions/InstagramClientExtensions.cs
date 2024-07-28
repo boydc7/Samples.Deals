@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Rydr.Api.Core.Configuration;
 using Rydr.Api.Core.Interfaces.Internal;
 using Rydr.Api.Core.Interfaces.Services;
@@ -10,42 +9,41 @@ using Rydr.FbSdk;
 using ServiceStack;
 using ServiceStack.Aws.DynamoDb;
 
-namespace Rydr.Api.Core.Extensions
+namespace Rydr.Api.Core.Extensions;
+
+public static class InstagramClientExtensions
 {
-    public static class InstagramClientExtensions
+    private static readonly IPocoDynamo _dynamoDb = RydrEnvironment.Container.Resolve<IPocoDynamo>();
+    private static readonly IAuthorizationService _authorizationService = RydrEnvironment.Container.Resolve<IAuthorizationService>();
+    private static readonly IEncryptionService _encryptionService = RydrEnvironment.Container.Resolve<IEncryptionService>();
+
+    public static Task<IInstagramBasicClient> GetOrCreateIgBasicClientAsync(this DynPublisherAppAccount publisherAppAccount, string rawAccessToken = null)
+        => GetOrCreateIgBasicClientAsync(new SyncPublisherAppAccountInfo(publisherAppAccount)
+                                         {
+                                             RawAccessToken = rawAccessToken.HasValue()
+                                                                  ? rawAccessToken
+                                                                  : null
+                                         });
+
+    public static async Task<IInstagramBasicClient> GetOrCreateIgBasicClientAsync(this SyncPublisherAppAccountInfo publisherAppAccountInfo)
     {
-        private static readonly IPocoDynamo _dynamoDb = RydrEnvironment.Container.Resolve<IPocoDynamo>();
-        private static readonly IAuthorizationService _authorizationService = RydrEnvironment.Container.Resolve<IAuthorizationService>();
-        private static readonly IEncryptionService _encryptionService = RydrEnvironment.Container.Resolve<IEncryptionService>();
+        var publisherApp = await _dynamoDb.GetPublisherAppAsync(publisherAppAccountInfo.PublisherAppId);
 
-        public static Task<IInstagramBasicClient> GetOrCreateIgBasicClientAsync(this DynPublisherAppAccount publisherAppAccount, string rawAccessToken = null)
-            => GetOrCreateIgBasicClientAsync(new SyncPublisherAppAccountInfo(publisherAppAccount)
-                                             {
-                                                 RawAccessToken = rawAccessToken.HasValue()
-                                                                      ? rawAccessToken
-                                                                      : null
-                                             });
+        await _authorizationService.VerifyAccessToAsync(publisherApp, a => a.PublisherType == PublisherType.Instagram);
 
-        public static async Task<IInstagramBasicClient> GetOrCreateIgBasicClientAsync(this SyncPublisherAppAccountInfo publisherAppAccountInfo)
-        {
-            var publisherApp = await _dynamoDb.GetPublisherAppAsync(publisherAppAccountInfo.PublisherAppId);
+        var result = await GetOrCreateIgBasicClientAsync(publisherApp, publisherAppAccountInfo.RawAccessToken.HasValue()
+                                                                           ? publisherAppAccountInfo.RawAccessToken
+                                                                           : await _encryptionService.Decrypt64Async(publisherAppAccountInfo.EncryptedAccessToken));
 
-            await _authorizationService.VerifyAccessToAsync(publisherApp, a => a.PublisherType == PublisherType.Instagram);
+        return result;
+    }
 
-            var result = await GetOrCreateIgBasicClientAsync(publisherApp, publisherAppAccountInfo.RawAccessToken.HasValue()
-                                                                               ? publisherAppAccountInfo.RawAccessToken
-                                                                               : await _encryptionService.Decrypt64Async(publisherAppAccountInfo.EncryptedAccessToken));
+    public static async Task<IInstagramBasicClient> GetOrCreateIgBasicClientAsync(this DynPublisherApp publisherApp, string accessToken)
+    {
+        Guard.AgainstNullArgument(accessToken.IsNullOrEmpty(), nameof(accessToken));
 
-            return result;
-        }
+        var decryptedSecret = await _encryptionService.Decrypt64Async(publisherApp.AppSecret);
 
-        public static async Task<IInstagramBasicClient> GetOrCreateIgBasicClientAsync(this DynPublisherApp publisherApp, string accessToken)
-        {
-            Guard.AgainstNullArgument(accessToken.IsNullOrEmpty(), nameof(accessToken));
-
-            var decryptedSecret = await _encryptionService.Decrypt64Async(publisherApp.AppSecret);
-
-            return InstagramBasicClient.Factory.GetOrCreateClient(publisherApp.AppId, decryptedSecret, accessToken);
-        }
+        return InstagramBasicClient.Factory.GetOrCreateClient(publisherApp.AppId, decryptedSecret, accessToken);
     }
 }

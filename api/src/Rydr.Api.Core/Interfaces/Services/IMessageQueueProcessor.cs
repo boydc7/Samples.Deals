@@ -1,11 +1,9 @@
-using System.Threading.Tasks;
 using Rydr.Api.Dto.Shared;
 
-namespace Rydr.Api.Core.Interfaces.Services
+namespace Rydr.Api.Core.Interfaces.Services;
+
+public interface IMessageQueueProcessor
 {
-    public interface IMessageQueueProcessor
-    {
-        Task<MqRetryResponse> ReprocessDlqAsync(MqRetry request);
-        Task<MqRetryResponse> ProcessInqAsync(MqRetry request);
-    }
+    Task<MqRetryResponse> ReprocessDlqAsync(MqRetry request);
+    Task<MqRetryResponse> ProcessInqAsync(MqRetry request);
 }

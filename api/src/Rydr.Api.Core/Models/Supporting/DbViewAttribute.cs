@@ -1,7 +1,4 @@
-using System;
+namespace Rydr.Api.Core.Models.Supporting;
 
-namespace Rydr.Api.Core.Models.Supporting
-{
-    [AttributeUsage(AttributeTargets.Class)]
-    public class DbViewAttribute : Attribute { }
-}
+[AttributeUsage(AttributeTargets.Class)]
+public class DbViewAttribute : Attribute { }

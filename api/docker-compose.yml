@@ -1,25 +1,29 @@
 # NOTE: This is meant for creating a local/entirely contained docker environment/build/run the api in - on AWS, we use ECS for main 
 # docker compose files are in /lib/ecs/... and related paths
-version: "3.7"
+version: "3.8"
 services:
   mysql:
     image: mysql
     container_name: rydrmysql
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
-    # If you want to expose mysql to the host...
     ports:
       - "2083:3306"
     expose:
       - "3306"
     environment:
+      - MYSQL_USER=rydrsql
+      - MYSQL_PASSWORD=7ygJRWTn2Wb42UgpF56Aj7N648N8P4dZ7C2
       - MYSQL_ROOT_PASSWORD=7ygJRWTn2Wb42UgpF56Aj7N648N8P4dZ7C2
       - MYSQL_DATABASE=rydr
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+      - RYDR_ENVIRONMENTNAME=Debug
+    volumes:
+      - ./lib/docker/mysql:/docker-entrypoint-initdb.d
+  opensearch:
+    image: opensearchproject/opensearch
     container_name: rydres
     environment:
       - discovery.type=single-node
+      - plugins.security.disabled=true
     # If you want to expose elasticsearch to the host...
     ports:
       - "2089:9200"
@@ -55,7 +59,7 @@ services:
       - "2080:2080"
     depends_on:
       - redis
-      - elasticsearch
+      - opensearch
       - dynamodb
       - mysql
     healthcheck:

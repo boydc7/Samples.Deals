@@ -1,7 +1,6 @@
-namespace Rydr.Api.Dto.Enums
+namespace Rydr.Api.Dto.Enums;
+
+public enum ExternalIntegrationType
 {
-    public enum ExternalIntegrationType
-    {
-        None
-    }
+    None
 }

@@ -13,31 +13,30 @@ using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.OrmLite.Dapper;
 
-namespace Rydr.Api.Core.Services.Internal
+namespace Rydr.Api.Core.Services.Internal;
+
+public class CompositeDataStreamProducer : IDataStreamProducer
 {
-    public class CompositeDataStreamProducer : IDataStreamProducer
+    private readonly IReadOnlyList<IDataStreamProducer> _producers;
+
+    public CompositeDataStreamProducer(IEnumerable<IDataStreamProducer> producers)
     {
-        private readonly IReadOnlyList<IDataStreamProducer> _producers;
+        _producers = producers.AsListReadOnly();
+    }
 
-        public CompositeDataStreamProducer(IEnumerable<IDataStreamProducer> producers)
+    public async Task ProduceAsync(string streamName, string value)
+    {
+        foreach (var producer in _producers)
         {
-            _producers = producers.AsListReadOnly();
+            await producer.ProduceAsync(streamName, value);
         }
+    }
 
-        public async Task ProduceAsync(string streamName, string value)
+    public async Task ProduceAsync(string streamName, IEnumerable<string> values, int hintCount = 50)
+    {
+        foreach (var producer in _producers)
         {
-            foreach (var producer in _producers)
-            {
-                await producer.ProduceAsync(streamName, value);
-            }
-        }
-
-        public async Task ProduceAsync(string streamName, IEnumerable<string> values, int hintCount = 50)
-        {
-            foreach (var producer in _producers)
-            {
-                await producer.ProduceAsync(streamName, values, hintCount);
-            }
+            await producer.ProduceAsync(streamName, values, hintCount);
         }
     }
 }

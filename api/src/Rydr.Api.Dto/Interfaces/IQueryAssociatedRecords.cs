@@ -1,10 +1,9 @@
 using Rydr.Api.Dto.Enums;
 
-namespace Rydr.Api.Dto.Interfaces
+namespace Rydr.Api.Dto.Interfaces;
+
+public interface IQueryAssociatedRecords : IDecorateAsRecordType
 {
-    public interface IQueryAssociatedRecords : IDecorateAsRecordType
-    {
-        long? RecordId { get; set; }
-        RecordType? RecordType { get; set; }
-    }
+    long? RecordId { get; set; }
+    RecordType? RecordType { get; set; }
 }

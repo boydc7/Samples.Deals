@@ -1,10 +1,9 @@
 using Rydr.Api.Dto.Publishers;
 
-namespace Rydr.Api.Dto.Interfaces
+namespace Rydr.Api.Dto.Interfaces;
+
+public interface IDecorateWithPublisherAccountInfo
 {
-    public interface IDecorateWithPublisherAccountInfo
-    {
-        long PublisherAccountId { get; }
-        PublisherAccountInfo PublisherAccount { get; set; }
-    }
+    long PublisherAccountId { get; }
+    PublisherAccountInfo PublisherAccount { get; set; }
 }

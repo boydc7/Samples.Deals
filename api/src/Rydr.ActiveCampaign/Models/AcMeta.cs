@@ -1,7 +1,6 @@
-namespace Rydr.ActiveCampaign.Models
+namespace Rydr.ActiveCampaign.Models;
+
+public class AcMeta
 {
-    public class AcMeta
-    {
-        public long Total { get; set; }
-    }
+    public long Total { get; set; }
 }

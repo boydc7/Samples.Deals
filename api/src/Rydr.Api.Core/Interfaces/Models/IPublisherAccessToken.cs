@@ -1,9 +1,8 @@
-namespace Rydr.Api.Core.Interfaces.Models
+namespace Rydr.Api.Core.Interfaces.Models;
+
+public interface IPublisherAccessToken
 {
-    public interface IPublisherAccessToken
-    {
-        string AccessToken { get; set; }
-        int Expires { get; set; }
-        string TokenType { get; set; }
-    }
+    string AccessToken { get; set; }
+    int Expires { get; set; }
+    string TokenType { get; set; }
 }

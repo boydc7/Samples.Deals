@@ -1,13 +1,11 @@
 using ServiceStack.Model;
 
-namespace Rydr.Api.Dto.Interfaces
+namespace Rydr.Api.Dto.Interfaces;
+
+public interface IHasName
 {
-    public interface IHasName
-    {
-        string Name { get; }
-    }
-
-    public interface IHasNameAndId : IHasName, IHasId<long> { }
-
-    public interface IHasNameAndIsRecordLookup : IHasName, ICanBeRecordLookup { }
+    string Name { get; }
 }
+
+public interface IHasNameAndId : IHasName, IHasId<long> { }
+public interface IHasNameAndIsRecordLookup : IHasName, ICanBeRecordLookup { }

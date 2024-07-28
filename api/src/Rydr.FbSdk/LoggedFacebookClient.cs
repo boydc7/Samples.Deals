@@ -1,133 +1,129 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Rydr.FbSdk.Extensions;
 using ServiceStack;
 using ServiceStack.Logging;
 
-namespace Rydr.FbSdk
+namespace Rydr.FbSdk;
+
+public class LoggedFacebookClient : FacebookClient
 {
-    public class LoggedFacebookClient : FacebookClient
+    private readonly ILog _log;
+
+    private long _sequence = 10001;
+
+    public LoggedFacebookClient(string appId, string appSecret, string accessToken)
+        : base(appId, appSecret, accessToken)
     {
-        private readonly ILog _log;
+        _log = LogManager.GetLogger(GetType());
+    }
 
-        private long _sequence = 10001;
+    protected override async Task<T> GetAsync<T>(string path, object parameters = null, bool eTag = false)
+    {
+        var seq = LogRequest(path, parameters);
 
-        public LoggedFacebookClient(string appId, string appSecret, string accessToken)
-            : base(appId, appSecret, accessToken)
+        T response = default;
+
+        var url = GetUrl(path, parameters);
+
+        try
         {
-            _log = LogManager.GetLogger(GetType());
+            var responseTuple = await GetAsyncInternal<T>(url, eTag).ConfigureAwait(false);
+
+            response = responseTuple.Response;
+        }
+        finally
+        {
+            LogResponse(response, seq, $"RequestUrl: [{url}]");
         }
 
-        protected override async Task<T> GetAsync<T>(string path, object parameters = null, bool eTag = false)
+        return response;
+    }
+
+    protected override async Task<T> PostAsync<T>(string initialPath, object parameters = null, string withSecretProof = null)
+    {
+        var seq = LogRequest(initialPath, parameters);
+
+        T response = default;
+
+        var url = GetUrl(initialPath, parameters, withSecretProof);
+
+        try
         {
-            var seq = LogRequest(path, parameters);
+            var responseTuple = await PostAsyncInternal<T>(url).ConfigureAwait(false);
 
-            T response = default;
-
-            var url = GetUrl(path, parameters);
-
-            try
-            {
-                var responseTuple = await GetAsyncInternal<T>(url, eTag).ConfigureAwait(false);
-
-                response = responseTuple.Response;
-            }
-            finally
-            {
-                LogResponse(response, seq, $"RequestUrl: [{url}]");
-            }
-
-            return response;
+            response = responseTuple.Response;
+        }
+        finally
+        {
+            LogResponse(response, seq, $"RequestUrl: [{url}]");
         }
 
-        protected override async Task<T> PostAsync<T>(string initialPath, object parameters = null, string withSecretProof = null)
+        return response;
+    }
+
+    protected override async IAsyncEnumerable<List<T>> GetPagedAsync<T>(string initialPath, object parameters = null, bool eTag = false)
+    {
+        var seq = LogRequest(initialPath, parameters);
+
+        var count = 0;
+
+        await foreach (var item in base.GetPagedAsync<T>(initialPath, parameters, eTag).ConfigureAwait(false))
         {
-            var seq = LogRequest(initialPath, parameters);
+            yield return item;
 
-            T response = default;
-
-            var url = GetUrl(initialPath, parameters, withSecretProof);
-
-            try
-            {
-                var responseTuple = await PostAsyncInternal<T>(url).ConfigureAwait(false);
-
-                response = responseTuple.Response;
-            }
-            finally
-            {
-                LogResponse(response, seq, $"RequestUrl: [{url}]");
-            }
-
-            return response;
+            count++;
         }
 
-        protected override async IAsyncEnumerable<List<T>> GetPagedAsync<T>(string initialPath, object parameters = null, bool eTag = false)
+        LogResponse(new
+                    {
+                        PagedResponse = true,
+                        Type = typeof(T).Name,
+                        ResultCount = count
+                    }, seq);
+    }
+
+    protected override IEnumerable<T> GetPaged<T>(string initialPath, object parameters = null)
+    {
+        var seq = LogRequest(initialPath, parameters);
+
+        var count = 0;
+
+        foreach (var item in base.GetPaged<T>(initialPath, parameters))
         {
-            var seq = LogRequest(initialPath, parameters);
+            yield return item;
 
-            var count = 0;
-
-            await foreach (var item in base.GetPagedAsync<T>(initialPath, parameters, eTag).ConfigureAwait(false))
-            {
-                yield return item;
-
-                count++;
-            }
-
-            LogResponse(new
-                        {
-                            PagedResponse = true,
-                            Type = typeof(T).Name,
-                            ResultCount = count
-                        }, seq);
+            count++;
         }
 
-        protected override IEnumerable<T> GetPaged<T>(string initialPath, object parameters = null)
-        {
-            var seq = LogRequest(initialPath, parameters);
+        LogResponse(new
+                    {
+                        PagedResponse = true,
+                        Type = typeof(T).Name,
+                        ResultCount = count
+                    }, seq);
+    }
 
-            var count = 0;
+    private long LogRequest(string path, object parameters)
+    {
+        var paramJsv = parameters == null
+                           ? "<null>"
+                           : parameters.ToJsv();
 
-            foreach (var item in base.GetPaged<T>(initialPath, parameters))
-            {
-                yield return item;
+        var log = string.Concat("path=[", path, "], params=[", paramJsv, "]");
 
-                count++;
-            }
+        return Log("REQUEST", log);
+    }
 
-            LogResponse(new
-                        {
-                            PagedResponse = true,
-                            Type = typeof(T).Name,
-                            ResultCount = count
-                        }, seq);
-        }
+    private void LogResponse<T>(T response, long sequence, string info = null)
+        => Log("RESPONSE", string.Concat(info ?? string.Empty, "\n", response?.ToJsv().Left(1000)) ?? "NO RESPONSE", sequence);
 
-        private long LogRequest(string path, object parameters)
-        {
-            var paramJsv = parameters == null
-                               ? "<null>"
-                               : parameters.ToJsv();
+    private long Log(string method, string log, long sequence = 0)
+    {
+        var logSequence = sequence > 0
+                              ? sequence
+                              : Interlocked.Increment(ref _sequence);
 
-            var log = string.Concat("path=[", path, "], params=[", paramJsv, "]");
+        _log.DebugFormat("|{0}|{1}|: {2}", logSequence, method, log);
 
-            return Log("REQUEST", log);
-        }
-
-        private void LogResponse<T>(T response, long sequence, string info = null)
-            => Log("RESPONSE", string.Concat(info ?? string.Empty, "\n", response?.ToJsv().Left(1000)) ?? "NO RESPONSE", sequence);
-
-        private long Log(string method, string log, long sequence = 0)
-        {
-            var logSequence = sequence > 0
-                                  ? sequence
-                                  : Interlocked.Increment(ref _sequence);
-
-            _log.DebugFormat("|{0}|{1}|: {2}", logSequence, method, log);
-
-            return logSequence;
-        }
+        return logSequence;
     }
 }

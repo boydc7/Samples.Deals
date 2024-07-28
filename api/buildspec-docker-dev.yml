@@ -11,7 +11,7 @@ phases:
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
-      - echo Building api image...          
+      - echo Building api image...
       - docker build -f lib/dockerfiles/rydrapi.dev.Dockerfile -t dev/rydr-api -t $REPOSITORY_URI .
       # - docker tag $REPOSITORY_URI $REPOSITORY_URI:$IMAGE_TAG
   post_build:

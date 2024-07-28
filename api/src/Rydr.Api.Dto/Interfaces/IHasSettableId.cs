@@ -1,11 +1,10 @@
 using ServiceStack.Model;
 
-namespace Rydr.Api.Dto.Interfaces
-{
-    public interface IHasSettableId : IHasLongId
-    {
-        new long Id { get; set; }
-    }
+namespace Rydr.Api.Dto.Interfaces;
 
-    public interface IHasCompositeId : IHasId<string> { }
+public interface IHasSettableId : IHasLongId
+{
+    new long Id { get; set; }
 }
+
+public interface IHasCompositeId : IHasId<string> { }

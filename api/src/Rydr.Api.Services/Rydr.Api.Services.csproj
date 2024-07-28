@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <OutputType>Library</OutputType>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
         <Configurations>Debug;Release;LocalDevelopment;LocalProduction;Development;LocalDocker</Configurations>
-        <Platforms>AnyCPU</Platforms>
-        <LangVersion>default</LangVersion>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,22 +46,26 @@
         <Optimize>false</Optimize>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="AWS.Logger.NLog" Version="1.5.2" />
-      <PackageReference Include="AWSSDK.Core" Version="3.3.106.22" />
-      <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.106.2" />
-      <PackageReference Include="Enums.NET" Version="3.0.3" />
-      <PackageReference Include="FirebaseAdmin" Version="1.12.0" />
-      <PackageReference Include="Google.Api.Gax" Version="3.0.0" />
-      <PackageReference Include="Google.Api.Gax.Rest" Version="3.0.0" />
-      <PackageReference Include="Google.Apis.Auth" Version="1.45.0" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.4" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.4" />
-      <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.4" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.4" />
-      <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
-      <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
-      <PackageReference Include="System.Data.SQLite" Version="1.0.112.2" />
+      <PackageReference Include="AWS.Logger.NLog" Version="3.3.4" />
+      <PackageReference Include="AWSSDK.Core" Version="3.7.304.29" />
+      <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.305" />
+      <PackageReference Include="Enums.NET" Version="5.0.0" />
+      <PackageReference Include="FirebaseAdmin" Version="3.0.0" />
+      <PackageReference Include="Google.Api.Gax" Version="4.8.0" />
+      <PackageReference Include="Google.Api.Gax.Rest" Version="4.8.0" />
+      <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+      <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+      <PackageReference Include="ServiceStack" Version="8.3.0" />
+      <PackageReference Include="ServiceStack.Aws" Version="8.3.0" />
+      <PackageReference Include="ServiceStack.Logging.NLog" Version="8.3.0" />
+      <PackageReference Include="ServiceStack.OrmLite" Version="8.3.0" />
+      <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+      <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+      <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
       <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
     </ItemGroup>
     <ItemGroup>
@@ -72,35 +74,6 @@
       <ProjectReference Include="..\Rydr.Api.Dto\Rydr.Api.Dto.csproj" />
       <ProjectReference Include="..\Rydr.Api.QueryDto\Rydr.Api.QueryDto.csproj" />
       <ProjectReference Include="..\Rydr.FbSdk\Rydr.FbSdk.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Include="ServiceStack, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Aws, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Aws.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Client, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Client.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Common, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Common.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Interfaces.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Logging.NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Logging.NLog.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.OrmLite, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.OrmLite.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Server, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Server.dll</HintPath>
-      </Reference>
-      <Reference Include="ServiceStack.Text, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\lib\servicestack\ServiceStack.Text.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

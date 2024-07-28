@@ -2,43 +2,42 @@ using System.Text;
 using Rydr.Api.Core.Extensions;
 using ServiceStack;
 
-namespace Rydr.Api.Core.Models.Supporting
+namespace Rydr.Api.Core.Models.Supporting;
+
+public class CompressedString
 {
-    public class CompressedString
+    private const int _minDataLengthToCompress = 1024 * 2; // 2Kb
+
+    private string _decompressedValue;
+
+    // Needed for serialization only, should not be used
+    public CompressedString() { }
+
+    public CompressedString(string source)
     {
-        private const int _minDataLengthToCompress = 1024 * 2; // 2Kb
+        IsCompressed = source is { Length: >= _minDataLengthToCompress };
 
-        private string _decompressedValue;
+        Value = IsCompressed
+                    ? source.CompressGzip64(Encoding.UTF8)
+                    : source;
+    }
 
-        // Needed for serialization only, should not be used
-        public CompressedString() { }
+    public string Value { get; set; }
+    public bool IsCompressed { get; set; }
 
-        public CompressedString(string source)
+    public static implicit operator string(CompressedString cs)
+        => cs?.ToString();
+
+    public static implicit operator CompressedString(string ss)
+        => new(ss);
+
+    public override string ToString()
+    {
+        if (!IsCompressed || Value.IsNullOrEmpty())
         {
-            IsCompressed = source is { Length: >= _minDataLengthToCompress };
-
-            Value = IsCompressed
-                        ? source.CompressGzip64(Encoding.UTF8)
-                        : source;
+            return Value.ToNullIfEmpty();
         }
 
-        public string Value { get; set; }
-        public bool IsCompressed { get; set; }
-
-        public static implicit operator string(CompressedString cs)
-            => cs?.ToString();
-
-        public static implicit operator CompressedString(string ss)
-            => new CompressedString(ss);
-
-        public override string ToString()
-        {
-            if (!IsCompressed || Value.IsNullOrEmpty())
-            {
-                return Value.ToNullIfEmpty();
-            }
-
-            return _decompressedValue ??= Value.DecompressGzip64(Encoding.UTF8);
-        }
+        return _decompressedValue ??= Value.DecompressGzip64(Encoding.UTF8);
     }
 }

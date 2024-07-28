@@ -1,8 +1,8 @@
 using ServiceStack.DataAnnotations;
 
-namespace Rydr.Api.Core.Models.Rydr
-{
-    [PostCreateTable(@"
+namespace Rydr.Api.Core.Models.Rydr;
+
+[PostCreateTable(@"
 DROP TABLE DeepLinkTracks;
 CREATE TABLE DeepLinkTracks
 (
@@ -21,44 +21,43 @@ PublisherAccountId BIGINT NOT NULL,
 PRIMARY KEY (Timestamp, Uniqueifier)
 );
 ")]
-    [Alias("DeepLinkTracks")]
-    public class RydrDeepLinkTrack
-    {
-        [Required]
-        public long Timestamp { get; set; }
+[Alias("DeepLinkTracks")]
+public class RydrDeepLinkTrack
+{
+    [Required]
+    public long Timestamp { get; set; }
 
-        [Required]
-        public long DealId { get; set; }
+    [Required]
+    public long DealId { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        public string Path { get; set; }
+    [Required]
+    [StringLength(100)]
+    public string Path { get; set; }
 
-        [StringLength(100)]
-        public string Campaign { get; set; }
+    [StringLength(100)]
+    public string Campaign { get; set; }
 
-        [StringLength(100)]
-        public string Medium { get; set; }
+    [StringLength(100)]
+    public string Medium { get; set; }
 
-        [StringLength(100)]
-        public string Source { get; set; }
+    [StringLength(100)]
+    public string Source { get; set; }
 
-        [StringLength(100)]
-        public string Content { get; set; }
+    [StringLength(100)]
+    public string Content { get; set; }
 
-        [StringLength(100)]
-        public string Term { get; set; }
+    [StringLength(100)]
+    public string Term { get; set; }
 
-        [StringLength(100)]
-        public string Uniqueifier { get; set; }
+    [StringLength(100)]
+    public string Uniqueifier { get; set; }
 
-        [Required]
-        public long WorkspaceId { get; set; }
+    [Required]
+    public long WorkspaceId { get; set; }
 
-        [Required]
-        public long UserId { get; set; }
+    [Required]
+    public long UserId { get; set; }
 
-        [Required]
-        public long PublisherAccountId { get; set; }
-    }
+    [Required]
+    public long PublisherAccountId { get; set; }
 }
